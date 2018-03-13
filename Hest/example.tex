@@ -12,29 +12,17 @@
 % /Stian
 \documentclass[10pt,xcolor={dvipsnames}]{beamer}
 
-%%% option passed to the outer theme
-%progressstyle=fixedCircCnt,   % fixedCircCnt, movingCircCnt (moving is deault)
+%the only option is shownavsym if you want navigation symbols
 \usetheme[]{Hest}
-  
-\setbeamercolor{Hest}{fg=NavyBlue!20,bg=NavyBlue} % Change the bar colors:
-\setbeamercolor{structure}{fg=NavyBlue} % Change the color of the structural elements:
-\setbeamercolor{frametitle}{fg=black!5} % Change the frame title text color:
-\setbeamercolor{normal text}{fg=black!75,bg=gray!5} % Change the normal text colors:
-\setbeamercolor{block title}{use=Hest,bg=Hest.fg,fg=black!90} %% Change the block title colors
 
-% \renewcommand{\logofile}{Hestgraphics/aau_logo}
-% \renewcommand{\logoscale}{0.82} %default er 0.82
-% \renewcommand{\backgroundfile}{Hestgraphics/aau_logo}
+%Use these commands to change the logo and the scale
+% \sethestlogofile{Hestgraphics/blabla} % default is aau_logo
+% \sethestlogoscale{0.57} %default is 0.82 for no particular reason, but it looks good with the aau logo
 
-% \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\usepackage[T1]{fontenc}
-\usepackage{listings}
-% \usepackage{helvet}
-% \usepackage{libertine}
-\usepackage{venturis}
 
-\usetikzlibrary{spy,arrows.meta,shapes,chains}
+%This is a nice font for this theme
+\usepackage{venturis}
 
 \title[Hest Beamer Theme]{Hest Theme}
 \subtitle[]{}

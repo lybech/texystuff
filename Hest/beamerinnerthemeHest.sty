@@ -13,6 +13,9 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{beamerinnerthemeHest}[2018/03/13 v1.1.0 Hest Beamer Theme]
+\RequirePackage{tikz}
+
+\usetikzlibrary{shadings, fadings}
 
 %     \def\nodeshadowed[#1]#2;{
 %       \node[scale=2,above,#1]{
@@ -22,12 +25,6 @@
 %       scope fading=south,opacity=0.4]{\box\mybox};
 %     }
 
-    
-    % \def\mynodeshadowed(#1)#2;{
-    %   \node[scale=2] at (#1) {#2};
-    %   \node[scale=2, below=35pt, yscale=-1,scope fading=south, opacity=0.4] at (#1) {#2};
-    % }
-
 \mode<presentation> {
   \setbeamerfont{institute}{family=\rmfamily, size = \footnotesize}
   \setbeamerfont{title}{family=\rmfamily, size = \Large} 
@@ -35,12 +32,6 @@
   \setbeamerfont{author}{family=\rmfamily, size = \normalsize}
   \setbeamerfont{date}{family=\rmfamily, size = \footnotesize}
 
-  %% LLT: make title background image configurable
-  \newcommand{\backgroundfile}{Hestgraphics/1}
-
-
-  % setting the above deffinitions
-  % LLT: Reset unnumbered frames count to 0
   \setbeamertemplate{title page}{
     \setcounter{unnumberedframe}{0}
     \begin{tikzpicture}[

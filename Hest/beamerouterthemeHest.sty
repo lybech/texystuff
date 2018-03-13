@@ -16,9 +16,9 @@
 
 \RequirePackage{tikz}
 \RequirePackage{calc}
+\RequirePackage[most]{tcolorbox}
 
-\newcommand{\logofile}{Hestgraphics/aau_logo}
-\newcommand{\logoscale}{0.82}
+\usetikzlibrary{shadings, fadings, chains}
 
 \newcounter{unnumberedframe}
 \define@key{beamerframe}{noframenumbering}[true]{%
@@ -28,6 +28,12 @@
 
 \DeclareOptionBeamer{shownavsym}{\def\beamer@shownavsym{true}}
 \ProcessOptionsBeamer\relax
+
+\def\hest@defaultlogo{Hestgraphics/aau_logo}
+\def\hest@defaultlogoscale{0.82}
+
+\def\sethestlogofile#1{\def\hest@defaultlogo{#1}}
+\def\sethestlogoscale#1{\def\hest@defaultlogoscale{#1}}
 
 % the height of the header is 2.5 times the lineheight of the frame title
 \newlength{\beamer@height}
@@ -110,7 +116,7 @@
     \fill[fill=normal text.bg] (logopos) circle (\beamer@logoinnerradius);
 
     % place the logo in the circle
-    \node at (logopos) {\includegraphics[width=\dimexpr \logoscale \beamer@logoradius * 2\relax]{\logofile}};
+    \node at (logopos) {\includegraphics[width=\dimexpr \hest@defaultlogoscale \beamer@logoradius * 2\relax]{\hest@defaultlogo}};
 
     % \pgfmathsetmacro{\effectivetotalframe}{max(\inserttotalframenumber-\theunnumberedframe,1)}
     % \pgfmathsetmacro{\progress}{(\insertframenumber-\theunnumberedframe-3)/\effectivetotalframe*(-360)}; 
