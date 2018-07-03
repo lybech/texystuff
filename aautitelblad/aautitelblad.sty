@@ -1,90 +1,242 @@
-% Pakke som genererer et AAU-titelblad
-% Af Stian L. Lybech
 \ProvidesPackage{aautitelblad}
-\RequirePackage{lastpage}       % to reference last page in page numbering
-\RequirePackage{geometry}       % to adjust geometry on the titling page
-\RequirePackage{etoolbox}       % for \ifcsdef
-\RequirePackage{tgschola}
+
 \RequirePackage{tikz}
-\renewcommand*\sfdefault{lmssq}
+\RequirePackage{enumitem} % til [leftmargin=*] på \begin{itemize}
+\RequirePackage{lastpage} % til sidste side i sidetallet
 
-\newif\if@vis@kasse\@vis@kassefalse
+\newlength{\aau@dim@margin}
+\newlength{\aau@dim@top}
+\newlength{\aau@dim@bottom}
+\newlength{\aau@dim@textwidth}
 
-\DeclareOption{viskasser}{\@vis@kassetrue}
-\ProcessOptions\relax
+\setlength{\aau@dim@margin}{2cm}
+\setlength{\aau@dim@top}{2cm}
+\setlength{\aau@dim@bottom}{2cm}
+\setlength{\aau@dim@textwidth}{\paperwidth}
+\addtolength{\aau@dim@textwidth}{-2\aau@dim@margin}
 
-\if@vis@kasse
-  \def\aau@vis#1{\fbox{#1}}
-\else
-  \def\aau@vis#1{#1}
-\fi
+\def\aau@blue{blue!30!black}
 
-%page geometry
-\ifx\titlepageleftcolumnwidth\undefined
-  \newlength{\titlepageleftcolumnwidth}
-  \newlength{\titlepagerightcolumnwidth}
-\fi
+\def\aautitelblad{
+  \begin{tikzpicture}[
+    remember picture, 
+    overlay,
+    blok/.style = {
+%       draw = black,
+      text = black,
+      shape = rectangle,
+      inner sep = 0em
+    }
+  ]
+    \coordinate[xshift = \aau@dim@margin, yshift = -\aau@dim@top] (top left) at (current page.north west);
+    \coordinate[xshift = -\aau@dim@margin, yshift = \aau@dim@bottom] (bottom right) at (current page.south east);
+    \coordinate (bottom left) at (top left |- bottom right);
+    \coordinate (top right) at (top left -| bottom right);
 
-\def\aau@start@dato{\relax}
-\def\aau@slut@dato{\relax}
-\def\aau@aflv@dato{\relax}
-\def\aau@projekt@titel{\relax}
-\def\aau@projekt@gruppe@nummer{\relax}
+    \node[rectangle, anchor = north east] (logo) at (top right) {
+      \tikz[yscale=-1, scale=.06, y=0.8pt, x=0.8pt] \path[fill = \aau@blue] \aau@logo@path;
+    };
 
-\iflanguage{danish}{
-  \def\aau@copyright@text{Rapportens indhold er frit tilgængeligt, men offentliggørelse (med kildeangivelse) må kun ske efter aftale med forfatterne.}
-}{
-  \def\aau@copyright@text{The content of this report is freely available, but publication (with reference) may only be undertaken by agreement with the authors.}
-}
+    \node[rectangle, anchor = north] (header) at (logo.south) {\aau@header};
+    
+    \node[blok, anchor = north west] (titel) at (top left |- header.south) {\aau@titel@blok};
+    \node[blok, anchor = north west, yshift = -0.5cm] (generalia) at (titel.south west) {\aau@generalia@blok};
+    
+    \node[rectangle, draw = black, anchor = north west] (synopsis) at (generalia.north east) {\aau@synopsis@blok};
+    \node[blok, text width = \aau@dim@textwidth, anchor = south west] (copyr) at (bottom left) {\textit{\tiny\aau@localize@copyright}};
 
-\def\aau@gruppe@medlemmer{\relax}
-\def\aau@gruppe@vejledere{\relax}
-
-%defineret i basicpgstyle.sty
-\ifcsname doc@rev@text\endcsname%
-  \def\doc@rev@text{\aau@projekt@gruppe@nummer{} -- \aau@projekt@titel}%
-\fi
-
-% \def\print@aau@copyright@text{%
-%   \setlength\unitlength{1mm}
-%   \begin{picture}(0,0)
-%     \put(0,-7){\footnotesize\itshape\textcolor{gray}{\aau@copyright@text}}
-%   \end{picture}
-% }
-
-\def\print@aau@copyright@text{
-  \begin{tikzpicture}[remember picture, overlay]
-    \node[xshift=1cm,yshift=1cm] at (current page.south west)
-    [text width=\textwidth, color=black] {\aau@copyright@text};
+%     \draw[black] (top left) -- (top right) -- (bottom right) -- (bottom left) -- cycle;
+%     \node[draw = black, text = black, rectangle] (bla) at (current page.center) {center};
   \end{tikzpicture}
 }
 
-\def\startdato#1{\def\aau@start@dato{#1}}	% Projektperiodens startdato
-\def\slutdato#1{\def\aau@slut@dato{#1}}	        % Projektperiodens slutdato
-\def\afleveringsdato#1{\def\aau@aflv@dato{#1}}  % Afleveringsdato
+%%% Alt hvad der kan sættes %%%
+\def\aau@projekt@titel{Sæt titel med `\texttt{\string\aausettitel\{\}}'}
+\def\aausettitel#1{\def\aau@projekt@titel{#1}}
 
-\def\projekttitel#1{\def\aau@projekt@titel{#1}}
-\def\projektgruppenummer#1{\def\aau@projekt@gruppe@nummer{#1}}
+\def\aausettema#1{\def\aau@projekt@tema{#1}}
+\def\aausetprojektperiode#1{\def\aau@projekt@periode{#1}}
+\def\aausetgruppenavn#1{\def\aau@gruppe@navn{#1}}
 
-\long\def\gruppemedlemmer#1{\long\def\aau@gruppe@medlemmer{#1}}
-\long\def\vejledere#1{\long\def\aau@gruppe@vejledere{#1}}
+\def\aausetgruppemedlem#1{
+  \advance\aau@medlem@tal by 1
+  \ifnum\aau@medlem@tal > 1
+    \xdef\aau@gruppemedlemmer{\aau@gruppemedlemmer,#1}
+  \else
+    \gdef\aau@gruppemedlemmer{#1}
+  \fi
+}
 
-\def\aaucopyrighttext#1{\def\aau@copyright@text{#1}}
-\def\aau@projekt@periode{\aau@start@dato{} -- \aau@slut@dato}
+\def\aausetvejleder#1{
+  \advance\aau@vejleder@tal by 1
+  \ifnum\aau@vejleder@tal > 1
+    \xdef\aau@vejledere{\aau@vejledere,#1}
+  \else
+    \gdef\aau@vejledere{#1}
+  \fi
+}
 
-\def\synopsisinput{\def\aau@projekt@synopsis}
+\def\aau@sidetal{\pageref{LastPage}}
+\def\aausetsidetal#1{\def\aau@sidetal{#1}}
+\def\aausetslutdato#1{\def\aau@slut@dato{#1}}
+
+\def\aausetstudieretning#1{\def\aau@studie@retning{#1}}
+\def\aausetstudieaar#1{\def\aau@studie@aar{#1}}
+\def\aausetvejnavn#1{\def\aau@studie@vejnavn{#1}}
+\def\aausetadresse#1{\def\aau@studie@postnummer{#1}}
+\def\aauseturl#1{\def\aau@studie@url{#1}}
+
+\def\aausetsynopsisfil{\def\aau@projekt@synopsis}
 \def\aau@input@synopsis{
-  \ifcsdef{aau@projekt@synopsis}{
-    \input{\aau@projekt@synopsis}
-  }{
+  \ifx\aau@projekt@synopsis\undefined
     Sæt den fil, der skal inputtes som synopsis, med \\
     `\texttt{\string\synopsisinput\{filnavn\}}'
+  \else
+    \input{\aau@projekt@synopsis}
+  \fi
+}
+%%% Slut på alt hvad der kan sættes %%%
+
+%Standardoplysninger om studiet (til logo)
+\def\aau@studie@retning{Datalogi}
+\def\aau@studie@aar{Tredje studieår}
+\def\aau@studie@vejnavn{Selma Lagerlöfs Vej 300}
+\def\aau@studie@postnummer{9220 Aalborg Øst}
+\def\aau@studie@url{http://www.cs.aau.dk}
+
+%Vi går på et dansk universitet. Standardsproget er dansk.
+\def\aau@localize@titel{Titel}
+\def\aau@localize@tema{Tema}
+\def\aau@localize@periode{Projektperiode}
+\def\aau@localize@gruppenavn{Projektgruppe}
+\def\aau@localize@gruppemedlemmer{Gruppemedlemmer}
+\def\aau@localize@vejleder@sg{Vejleder}
+\def\aau@localize@vejleder@pl{Vejledere}
+\def\aau@localize@sidetal{Antal sider}
+\def\aau@localize@slutdato{Afsluttet}
+\def\aau@localize@synopsis{Synopsis}
+
+\def\aau@localize@copyright{Rapportens indhold er frit tilgængeligt, men offentliggørelse (med kildeangivelse) må kun ske efter aftale med forfatterne.}
+\def\aau@localize@aaunavn{aalborg universitet}
+\def\aau@localize@rapport{Studenterrapport}
+
+\iflanguage{danish}{}{
+  \def\aau@localize@titel{Title}
+  \def\aau@localize@tema{Theme}
+  \def\aau@localize@periode{Project period}
+  \def\aau@localize@gruppenavn{Group name}
+  \def\aau@localize@gruppemedlemmer{Group members}
+  \def\aau@localize@vejleder@sg{Supervisor}
+  \def\aau@localize@vejleder@pl{Supervisors}
+  \def\aau@localize@sidetal{Page count}
+  \def\aau@localize@slutdato{Date of completion}
+  \def\aau@localize@synopsis{Abstract}
+
+  \def\aau@localize@copyright{The content of this report is freely available, but publication (with reference) may only be undertaken by agreement with the authors.}
+  \def\aau@localize@aaunavn{aalborg university}
+  \def\aau@localize@rapport{Student report}
+}
+
+% Til at tælle gruppemedlemmer og vejledere
+\newcount\aau@medlem@tal\aau@medlem@tal=0
+\newcount\aau@vejleder@tal\aau@vejleder@tal=0
+
+%Nemmere end at kræve hyperref
+\ifx\url\undefined
+  \def\url#1{\texttt{#1}}
+\fi
+
+\long\def\aau@blaindent#1{
+  \begin{itemize}\itemsep0em
+    \item[] #1
+  \end{itemize}
+}
+
+\def\aau@testandset#1#2{
+  \ifcsname #1\endcsname #2\fi
+}
+
+\def\aau@titel@blok{
+  \parbox[t][][t]{\aau@dim@textwidth}{
+    \begin{itemize}[leftmargin=*]
+      \item[] \textbf{\aau@localize@titel:}
+      \aau@blaindent{\aau@projekt@titel}
+    \end{itemize}
   }
 }
 
-\def\tegn@aau@logo{
-\begin{tikzpicture}[y=0.80pt, x=0.80pt, yscale=-1.000000, xscale=1.000000, scale=.06, inner sep=0pt, outer sep=0pt]
-\path[fill=blue!30!black] (634.5000,1246.4420) .. controls (551.2735,1243.6401) and
+\long\def\aau@generalia@blok{
+  \parbox[t][][t]{.5\aau@dim@textwidth}{
+    \begin{itemize}[leftmargin=*]
+      \aau@testandset{aau@projekt@tema}{
+        \item[] \textbf{\aau@localize@tema:}
+        \aau@blaindent{\aau@projekt@tema}
+      }
+      \aau@testandset{aau@projekt@periode}{
+        \item[] \textbf{\aau@localize@periode:}
+        \aau@blaindent{\aau@projekt@periode}
+      }
+      \aau@testandset{aau@gruppe@navn}{
+        \item[] \textbf{\aau@localize@gruppenavn:}
+        \aau@blaindent{\aau@gruppe@navn}
+      }
+      \aau@testandset{aau@gruppemedlemmer}{
+        \item[] \textbf{\aau@localize@gruppemedlemmer:}
+        \begin{itemize}\itemsep0em
+          \foreach \aau@medlem in \aau@gruppemedlemmer { \item[] \aau@medlem }
+          \global\let\aau@gruppemedlemmer\undefined
+        \end{itemize}      
+      }
+      \aau@testandset{aau@vejledere}{
+        \item[] \ifnum\aau@vejleder@tal > 1 %
+          \textbf{\aau@localize@vejleder@pl:}\else
+          \textbf{\aau@localize@vejleder@sg:}\fi
+        \begin{itemize}\itemsep0em
+          \foreach \aau@vejleder in \aau@vejledere { \item[] \aau@vejleder }
+          \global\let\vejledere\undefined
+        \end{itemize}
+      }
+      %
+      \item[] \textbf{\aau@localize@sidetal:}
+      \aau@blaindent{\aau@sidetal}
+      %
+      \aau@testandset{aau@slut@dato}{
+        \item[] \textbf{\aau@localize@slutdato:}
+        \aau@blaindent{\aau@slut@dato}
+      }
+    \end{itemize}
+  }
+}
+
+\long\def\aau@synopsis@blok{
+  \parbox[t][][t]{.5\aau@dim@textwidth}{
+    \textbf{\aau@localize@synopsis:}
+  
+    \small
+    \aau@input@synopsis
+  }
+}
+
+\long\def\aau@header{
+  \parbox[t][][t]{3.6cm}{
+    \renewcommand*\sfdefault{lmssq}
+    \renewcommand{\arraystretch}{0.4}
+    \begin{tabular}{l l}
+      \multicolumn{2}{l}{\textcolor{\aau@blue}{\textsc{\aau@localize@aaunavn}} }      \\
+      \multicolumn{2}{l}{\textcolor{\aau@blue}{\sffamily\small\aau@localize@rapport}} \\
+        &                                           \\
+        &       {\tiny\textbf{\aau@studie@retning}} \\
+        &       {\tiny\textbf{\aau@studie@aar}}     \\
+        &       {\tiny\aau@studie@vejnavn}          \\
+        &       {\tiny\aau@studie@postnummer}       \\
+        &       {\tiny\url{\aau@studie@url}}        \\
+    \end{tabular}
+  }
+}
+
+%AAUs logo
+\def\aau@logo@path{%
+(634.5000,1246.4420) .. controls (551.2735,1243.6401) and
   (469.6387,1224.6635) .. (392.8652,1190.2720) .. controls (385.7085,1187.0661)
   and (375.8183,1182.4183) .. (370.8870,1179.9437) -- (361.9210,1175.4443) --
   (356.9677,1160.3471) .. controls (320.8511,1050.2672) and (309.5029,934.6419)
@@ -149,97 +301,5 @@
   (266.2223,536.7015) .. (220.4154,631.3500) .. controls (183.3679,707.8996) and
   (162.0513,796.9256) .. (154.7964,905.4000) .. controls (153.3425,927.1380) and
   (151.8853,983.4896) .. (152.4981,994.2750) .. controls (153.0509,1004.0032)
-  and (152.6818,1005.8690) .. (150.7454,1003.1365) -- cycle;
-
-\end{tikzpicture}
+  and (152.6818,1005.8690) .. (150.7454,1003.1365) -- cycle
 }
-
-\long\def\aau@header{
-  \parbox[t][5.5cm][c]{3.6cm}{
-    \begin{center}
-    \tegn@aau@logo
-    \end{center}
-    
-    \renewcommand{\arraystretch}{0.4}
-    \begin{tabular}{l l}
-      \multicolumn{2}{l}{\textsc{aalborg universitet} }    \\
-      \multicolumn{2}{l}{\sffamily\small Studenterrapport} \\
-        &                                                  \\
-        &       {\tiny\textbf{Andet studieår}}             \\
-        &       {\tiny\textbf{Datalogi}}                   \\
-        &       {\tiny Selma Lagerlöfs Vej 300}            \\
-        &       {\tiny 9220 Aalborg Øst}                   \\
-        &       {\tiny\url{http://www.cs.aau.dk}}          \\
-    \end{tabular}
-  }
-}
-
-\long\def\aau@synopsis{
-  \fbox{
-    \parbox{\titlepagerightcolumnwidth}{
-      \textbf{Synopsis:}
-    
-      \small
-      \aau@input@synopsis
-    }
-  }
-}
-
-\def\aau@title@block{
-  \parbox{.8\textwidth}{
-    \begin{description}
-      \item[Titel:]~\\
-      \aau@projekt@titel
-      \vspace{0.4cm}
-    \end{description}
-  }
-}
-
-\def\aau@generalia@block{
-  \parbox{\titlepageleftcolumnwidth}{
-    \begin{description}
-      \item[Projektperiode:]~\\
-      \aau@projekt@periode
-
-      \item[Projektgruppe:]~\\
-      \aau@projekt@gruppe@nummer
-        
-      \item[Gruppemedlemmer:]~\\
-      \aau@gruppe@medlemmer
-
-      \item[Vejleder:]~\\
-      \aau@gruppe@vejledere
-
-  %   \item[Antal kopier:] ?
-      \item[Antal sider:] ~\\
-      \pageref{LastPage}
-
-      \item[Afsluttet:]~\\
-      \aau@slut@dato
-    \end{description}
-  }
-}
-
-\newcommand{\aautitelblad}{
-  \newgeometry{right=2cm,left=2cm,top=0.2cm}
-  \setlength{\titlepageleftcolumnwidth}{0.5\textwidth-3\tabcolsep}
-  \setlength{\titlepagerightcolumnwidth}{\textwidth-3\tabcolsep-\titlepageleftcolumnwidth}
-  \thispagestyle{empty}
-
-%   \resizebox{\textwidth}{!}{%
-    \aau@vis{
-      \noindent%
-      \begin{tabular}[b]{@{} l @{} r @{}}
-        \multicolumn{2}{@{} r @{}}{\aau@vis{\aau@header}}               \\
-        \multicolumn{2}{@{} l @{}}{\aau@vis{\aau@title@block}}          \\
-        \aau@vis{\aau@generalia@block}    & \aau@synopsis               \\
-                                          &                             \\
-%         \multicolumn{2}{@{} l @{}}{\textit{\tiny \aau@copyright@text}}  \\
-      \end{tabular}
-    }
-%   }
-  \restoregeometry
-  \print@aau@copyright@text
-}
-
-\endinput

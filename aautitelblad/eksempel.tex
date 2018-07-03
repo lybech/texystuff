@@ -1,0 +1,90 @@
+% Hvis du bruger xelatex og memoir som din dokumentklasse (selvfølgelig bruger du memoir!), 
+% så husk at sætte a4paper, for at pakken kan beregne sidestørrelsen rigtigt, 
+% da memoir emulerer geometry-pakken
+\documentclass[a4paper]{memoir}
+
+% Hvis du IKKE bruger xelatex + memoir (men selvfølgelig gør du det!), 
+% så skal du enten bruge \usepackage[pass]{geometry} eller indlæse \usepackage{hyperref}
+
+% Hvis du bruger \usepackage[english]{babel} i stedet, får du titelbladet på engelsk
+\usepackage[danish]{babel}
+
+\usepackage{ucs}
+\usepackage[T1]{fontenc}
+
+% Brug kun nedenstående, hvis du ikke bruger xelatex (og selvfølgelig bruger du xelatex!)
+% \usepackage[utf8x]{inputenc}	
+
+% TeX Gyre er en pæn skrifttype, som ser godt ud på titelbladet
+\usepackage{tgschola}
+
+% Ellers kan jeg anbefale Linux Libertine
+% \usepackage{libertine} 
+
+% Pakke til at generere mumletekst i dette eksempel
+% Den er kun til test af aautitelblad, og du kan roligt fjerne den
+\usepackage{blindtext}
+
+% Anbring aautitelblad.sty i roden af din dokumentmappe, eller i din lokale texmf-mappestruktur
+\usepackage{aautitelblad}
+
+% Generer en fil kaldet synopsis.tex med mumletekst i
+% Dette er kun til brug i eksemplet, og du kan roligt slette det
+\newwrite\synopsisfil
+\immediate\openout\synopsisfil=synopsis.tex
+\immediate\write\synopsisfil{\noexpand\blindtext}
+\immediate\closeout\synopsisfil
+
+%%% Opsætning af AAU-Titelblad %%%
+\aausettitel{Udvikling af et AAU-titelblad i \TeX}
+
+% Hvis du udelader nogle af nedenstående (fx projektets tema),
+% vil de blot ikke fremgå af generaliablokken på venstre side
+\aausettema{Tekstopsætning med \TeX{} og Ti\textcolor{orange}{\itshape k}Z}
+
+\aausetprojektperiode{Forår, 2018}
+\aausetgruppenavn{d403}
+\aausetslutdato{3. juli, 2018}
+
+% \aausetgruppemedlem{} kan gentages for at sætte flere gruppemedlemmer
+\aausetgruppemedlem{Birger Bertramsen}
+\aausetgruppemedlem{Bjarne Golbæk}
+\aausetgruppemedlem{Børge Jensen}
+\aausetgruppemedlem{Bjarke Bredow}
+\aausetgruppemedlem{Bent Bøgsted}
+\aausetgruppemedlem{Bjørn Nake}
+\aausetgruppemedlem{Benny Engelbrecht}
+
+% \aausetvejleder kan også gentages, hvis der har været flere vejledere
+\aausetvejleder{Hans Egede}
+\aausetvejleder{Hua Lua}
+
+% Brug kun \aausetsidetal, hvis man ønsker at sætte sidetallet manuelt 
+% (fx hvis man ikke vil tælle bilag med).
+% Hvis den ikke er sat, tager pakken sidetallet fra lastpage
+% \aausetsidetal{117} 
+
+% Navn (og evt. sti) på den fil (uden .tex-endelse), som indeholder synopsisteksten
+\aausetsynopsisfil{synopsis}
+
+% Brug nedenstående til at opsætte teksten under AAU-logoet i øverste højre hjørne,
+% dvs. hvis du fx læser software (i stedet for datalogi)
+% eller hvis du går på et andet semester/en anden årgang
+% \aausetstudieretning{Software}
+% \aausetstudieaar{Første studieår} %Eller fx Første semester
+% \aausetvejnavn{Strandvejen 12--14}
+% \aausetadresse{9000 Aalborg}
+% \aauseturl{http://tnb.aau.dk}
+
+%%% Slut på opsætning af AAU-Titelblad %%%
+
+\begin{document}
+
+% Fjern sidehoved og sidefod mv. i memoir på denne side
+\thispagestyle{empty}
+
+%generer titelbladet
+\aautitelblad
+
+\end{document}
+
