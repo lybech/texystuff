@@ -1,0 +1,245 @@
+% Pakke som genererer et AAU-titelblad
+% Af Stian L. Lybech
+\ProvidesPackage{aautitelblad}
+\RequirePackage{lastpage}       % to reference last page in page numbering
+\RequirePackage{geometry}       % to adjust geometry on the titling page
+\RequirePackage{etoolbox}       % for \ifcsdef
+\RequirePackage{tgschola}
+\RequirePackage{tikz}
+\renewcommand*\sfdefault{lmssq}
+
+\newif\if@vis@kasse\@vis@kassefalse
+
+\DeclareOption{viskasser}{\@vis@kassetrue}
+\ProcessOptions\relax
+
+\if@vis@kasse
+  \def\aau@vis#1{\fbox{#1}}
+\else
+  \def\aau@vis#1{#1}
+\fi
+
+%page geometry
+\ifx\titlepageleftcolumnwidth\undefined
+  \newlength{\titlepageleftcolumnwidth}
+  \newlength{\titlepagerightcolumnwidth}
+\fi
+
+\def\aau@start@dato{\relax}
+\def\aau@slut@dato{\relax}
+\def\aau@aflv@dato{\relax}
+\def\aau@projekt@titel{\relax}
+\def\aau@projekt@gruppe@nummer{\relax}
+
+\iflanguage{danish}{
+  \def\aau@copyright@text{Rapportens indhold er frit tilgængeligt, men offentliggørelse (med kildeangivelse) må kun ske efter aftale med forfatterne.}
+}{
+  \def\aau@copyright@text{The content of this report is freely available, but publication (with reference) may only be undertaken by agreement with the authors.}
+}
+
+\def\aau@gruppe@medlemmer{\relax}
+\def\aau@gruppe@vejledere{\relax}
+
+%defineret i basicpgstyle.sty
+\ifcsname doc@rev@text\endcsname%
+  \def\doc@rev@text{\aau@projekt@gruppe@nummer{} -- \aau@projekt@titel}%
+\fi
+
+% \def\print@aau@copyright@text{%
+%   \setlength\unitlength{1mm}
+%   \begin{picture}(0,0)
+%     \put(0,-7){\footnotesize\itshape\textcolor{gray}{\aau@copyright@text}}
+%   \end{picture}
+% }
+
+\def\print@aau@copyright@text{
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[xshift=1cm,yshift=1cm] at (current page.south west)
+    [text width=\textwidth, color=black] {\aau@copyright@text};
+  \end{tikzpicture}
+}
+
+\def\startdato#1{\def\aau@start@dato{#1}}	% Projektperiodens startdato
+\def\slutdato#1{\def\aau@slut@dato{#1}}	        % Projektperiodens slutdato
+\def\afleveringsdato#1{\def\aau@aflv@dato{#1}}  % Afleveringsdato
+
+\def\projekttitel#1{\def\aau@projekt@titel{#1}}
+\def\projektgruppenummer#1{\def\aau@projekt@gruppe@nummer{#1}}
+
+\long\def\gruppemedlemmer#1{\long\def\aau@gruppe@medlemmer{#1}}
+\long\def\vejledere#1{\long\def\aau@gruppe@vejledere{#1}}
+
+\def\aaucopyrighttext#1{\def\aau@copyright@text{#1}}
+\def\aau@projekt@periode{\aau@start@dato{} -- \aau@slut@dato}
+
+\def\synopsisinput{\def\aau@projekt@synopsis}
+\def\aau@input@synopsis{
+  \ifcsdef{aau@projekt@synopsis}{
+    \input{\aau@projekt@synopsis}
+  }{
+    Sæt den fil, der skal inputtes som synopsis, med \\
+    `\texttt{\string\synopsisinput\{filnavn\}}'
+  }
+}
+
+\def\tegn@aau@logo{
+\begin{tikzpicture}[y=0.80pt, x=0.80pt, yscale=-1.000000, xscale=1.000000, scale=.06, inner sep=0pt, outer sep=0pt]
+\path[fill=blue!30!black] (634.5000,1246.4420) .. controls (551.2735,1243.6401) and
+  (469.6387,1224.6635) .. (392.8652,1190.2720) .. controls (385.7085,1187.0661)
+  and (375.8183,1182.4183) .. (370.8870,1179.9437) -- (361.9210,1175.4443) --
+  (356.9677,1160.3471) .. controls (320.8511,1050.2672) and (309.5029,934.6419)
+  .. (324.5256,829.8000) .. controls (333.2079,769.2071) and (349.9318,714.3745)
+  .. (375.7200,661.9500) .. controls (399.9679,612.6566) and (430.0910,570.2583)
+  .. (469.3239,530.2024) .. controls (503.3340,495.4789) and (525.0181,478.1337)
+  .. (583.6500,438.7527) .. controls (757.0485,322.2869) and (839.3495,254.1994)
+  .. (893.2212,182.6451) .. controls (927.6009,136.9808) and (950.9806,88.2680)
+  .. (965.7634,31.5000) .. controls (967.3745,25.3125) and (968.9685,19.9287) ..
+  (969.3055,19.5360) .. controls (969.6425,19.1432) and (971.1947,19.5482) ..
+  (972.7549,20.4360) .. controls (975.5855,22.0464) and (975.5906,22.0629) ..
+  (975.0556,27.9000) .. controls (967.8809,106.1822) and (944.2980,173.6203) ..
+  (898.4796,246.8785) .. controls (862.8893,303.7830) and (824.9558,353.2978) ..
+  (732.1804,463.9500) .. controls (699.7324,502.6502) and (676.6782,534.5084) ..
+  (654.9229,570.7108) .. controls (569.5704,712.7429) and (555.0873,855.5863) ..
+  (609.8414,1015.3402) .. controls (632.8007,1082.3278) and (673.4527,1162.6410)
+  .. (721.1529,1235.2500) -- (726.4741,1243.3500) -- (721.2121,1243.9457) ..
+  controls (701.3952,1246.1892) and (661.2891,1247.3438) .. (634.5000,1246.4420)
+  -- cycle(940.0500,1170.7230) .. controls (912.1314,1148.0973) and
+  (880.8130,1116.7045) .. (858.0719,1088.5500) .. controls (779.0342,990.6977)
+  and (738.8599,878.8150) .. (741.8932,765.0000) .. controls (743.8636,691.0637)
+  and (761.6465,620.9680) .. (797.6044,545.4000) .. controls (809.9911,519.3684)
+  and (821.7978,498.6806) .. (850.5088,452.7000) .. controls (912.4852,353.4451)
+  and (943.5315,297.2908) .. (965.3083,245.0590) .. controls (991.9126,181.2485)
+  and (1005.0785,124.8682) .. (1010.2919,52.4250) .. controls
+  (1010.6215,47.8463) and (1011.0893,44.1000) .. (1011.3317,44.1000) .. controls
+  (1011.5740,44.1000) and (1012.8985,44.7653) .. (1014.2750,45.5784) .. controls
+  (1017.1676,47.2871) and (1017.2099,47.5538) .. (1018.8955,74.7000) .. controls
+  (1020.2256,96.1201) and (1019.4201,154.4034) .. (1017.5149,174.6000) ..
+  controls (1013.0899,221.5076) and (1005.6725,263.5572) .. (993.1455,312.7500)
+  .. controls (983.3761,351.1138) and (975.7760,375.5724) .. (950.0780,451.3500)
+  .. controls (928.9504,513.6503) and (917.2948,566.4565) .. (913.4348,617.3648)
+  .. controls (912.0819,635.2069) and (912.8110,674.3368) .. (914.7736,689.2151)
+  .. controls (922.2583,745.9570) and (941.7038,791.5157) .. (976.1878,833.1011)
+  .. controls (986.4176,845.4376) and (1008.8545,867.1660) ..
+  (1023.3000,878.7256) .. controls (1037.7723,890.3067) and (1063.0836,907.3449)
+  .. (1083.6000,919.3163) .. controls (1103.8883,931.1547) and
+  (1139.7347,948.9103) .. (1167.0605,960.6565) .. controls (1181.7216,966.9587)
+  and (1189.5660,970.7788) .. (1189.1927,971.4344) .. controls
+  (1188.8746,971.9930) and (1183.9351,978.7176) .. (1178.2158,986.3780) ..
+  controls (1121.7871,1061.9598) and (1048.6566,1124.8302) ..
+  (964.2745,1170.3036) .. controls (956.3175,1174.5916) and (949.6368,1178.0813)
+  .. (949.4286,1178.0583) .. controls (949.2204,1178.0363) and
+  (945.0000,1174.7345) .. (940.0500,1170.7230) -- cycle(150.7454,1003.1365) ..
+  controls (150.2529,1002.4416) and (145.1454,995.6578) .. (139.3954,988.0615)
+  .. controls (40.1684,856.9731) and (-5.9406,692.9549) .. (10.3998,529.2000) ..
+  controls (12.3441,509.7151) and (16.1655,483.3722) .. (17.5152,480.1500) ..
+  controls (19.0238,476.5485) and (35.2350,453.9958) .. (45.9806,440.5496) ..
+  controls (59.8507,423.1937) and (73.3091,408.4058) .. (91.4679,390.5690) ..
+  controls (131.4780,351.2684) and (172.9330,321.2054) .. (221.8500,296.0164) ..
+  controls (277.5644,267.3273) and (332.5926,250.1587) .. (397.6965,241.1530) ..
+  controls (520.5415,224.1600) and (573.5831,215.6002) .. (623.3277,204.7408) ..
+  controls (701.8400,187.6014) and (758.1759,167.3755) .. (804.9191,139.5453) ..
+  controls (856.2618,108.9766) and (898.4550,63.6008) .. (924.8570,10.5606) ..
+  controls (927.7483,4.7523) and (930.6091,0.0000) .. (931.2145,0.0000) ..
+  controls (931.8199,0.0000) and (933.3079,0.4523) .. (934.5212,1.0051) --
+  (936.7271,2.0101) -- (935.0516,7.9801) .. controls (926.3559,38.9640) and
+  (911.0645,71.5938) .. (890.2879,103.5000) .. controls (844.9082,173.1886) and
+  (777.7547,232.5794) .. (689.6476,280.9469) .. controls (668.4044,292.6086) and
+  (647.4139,302.5797) .. (607.9500,319.7557) .. controls (525.5420,355.6224) and
+  (482.3031,376.7728) .. (438.7500,402.5203) .. controls (336.6700,462.8674) and
+  (266.2223,536.7015) .. (220.4154,631.3500) .. controls (183.3679,707.8996) and
+  (162.0513,796.9256) .. (154.7964,905.4000) .. controls (153.3425,927.1380) and
+  (151.8853,983.4896) .. (152.4981,994.2750) .. controls (153.0509,1004.0032)
+  and (152.6818,1005.8690) .. (150.7454,1003.1365) -- cycle;
+
+\end{tikzpicture}
+}
+
+\long\def\aau@header{
+  \parbox[t][5.5cm][c]{3.6cm}{
+    \begin{center}
+    \tegn@aau@logo
+    \end{center}
+    
+    \renewcommand{\arraystretch}{0.4}
+    \begin{tabular}{l l}
+      \multicolumn{2}{l}{\textsc{aalborg universitet} }    \\
+      \multicolumn{2}{l}{\sffamily\small Studenterrapport} \\
+        &                                                  \\
+        &       {\tiny\textbf{Andet studieår}}             \\
+        &       {\tiny\textbf{Datalogi}}                   \\
+        &       {\tiny Selma Lagerlöfs Vej 300}            \\
+        &       {\tiny 9220 Aalborg Øst}                   \\
+        &       {\tiny\url{http://www.cs.aau.dk}}          \\
+    \end{tabular}
+  }
+}
+
+\long\def\aau@synopsis{
+  \fbox{
+    \parbox{\titlepagerightcolumnwidth}{
+      \textbf{Synopsis:}
+    
+      \small
+      \aau@input@synopsis
+    }
+  }
+}
+
+\def\aau@title@block{
+  \parbox{.8\textwidth}{
+    \begin{description}
+      \item[Titel:]~\\
+      \aau@projekt@titel
+      \vspace{0.4cm}
+    \end{description}
+  }
+}
+
+\def\aau@generalia@block{
+  \parbox{\titlepageleftcolumnwidth}{
+    \begin{description}
+      \item[Projektperiode:]~\\
+      \aau@projekt@periode
+
+      \item[Projektgruppe:]~\\
+      \aau@projekt@gruppe@nummer
+        
+      \item[Gruppemedlemmer:]~\\
+      \aau@gruppe@medlemmer
+
+      \item[Vejleder:]~\\
+      \aau@gruppe@vejledere
+
+  %   \item[Antal kopier:] ?
+      \item[Antal sider:] ~\\
+      \pageref{LastPage}
+
+      \item[Afsluttet:]~\\
+      \aau@slut@dato
+    \end{description}
+  }
+}
+
+\newcommand{\aautitelblad}{
+  \newgeometry{right=2cm,left=2cm,top=0.2cm}
+  \setlength{\titlepageleftcolumnwidth}{0.5\textwidth-3\tabcolsep}
+  \setlength{\titlepagerightcolumnwidth}{\textwidth-3\tabcolsep-\titlepageleftcolumnwidth}
+  \thispagestyle{empty}
+
+%   \resizebox{\textwidth}{!}{%
+    \aau@vis{
+      \noindent%
+      \begin{tabular}[b]{@{} l @{} r @{}}
+        \multicolumn{2}{@{} r @{}}{\aau@vis{\aau@header}}               \\
+        \multicolumn{2}{@{} l @{}}{\aau@vis{\aau@title@block}}          \\
+        \aau@vis{\aau@generalia@block}    & \aau@synopsis               \\
+                                          &                             \\
+%         \multicolumn{2}{@{} l @{}}{\textit{\tiny \aau@copyright@text}}  \\
+      \end{tabular}
+    }
+%   }
+  \restoregeometry
+  \print@aau@copyright@text
+}
+
+\endinput
