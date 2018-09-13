@@ -4,3 +4,6 @@
 *.nav
 *.toc
 *.snm
+
+# Autogenereret fil
+aautitelblad/synopsis.tex

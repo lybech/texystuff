@@ -8,6 +8,13 @@
 \RequirePackage{enumitem} % til [leftmargin=*] på \begin{itemize}
 \RequirePackage{lastpage} % til sidste side i sidetallet
 
+\newif\if@aau@debug\@aau@debugfalse
+\DeclareOption{debug}{
+  \@aau@debugtrue
+}
+
+\ProcessOptions\relax
+
 \newlength{\aau@dim@margin}
 \newlength{\aau@dim@top}
 \newlength{\aau@dim@bottom}
@@ -22,15 +29,23 @@
 \def\aau@blue{blue!30!black}
 
 \def\aautitelblad{
+  \tikzset{baseblock/.style = {
+      text = black,
+      shape = rectangle,
+      inner sep = 0pt
+    }
+  }
+  
+  \if@aau@debug
+    \tikzset{blok/.style = { draw = black, baseblock }}
+  \else
+    \tikzset{blok/.style = {baseblock}}
+  \fi
+  
   \begin{tikzpicture}[
     remember picture, 
     overlay,
-    blok/.style = {
-%       draw = black,
-      text = black,
-      shape = rectangle,
-      inner sep = 0em
-    }
+    blok
   ]
     \coordinate[xshift = \aau@dim@margin, yshift = -\aau@dim@top] (top left) at (current page.north west);
     \coordinate[xshift = -\aau@dim@margin, yshift = \aau@dim@bottom] (bottom right) at (current page.south east);
@@ -42,15 +57,15 @@
     };
 
     \node[rectangle, anchor = north] (header) at (logo.south) {\aau@header};
-    
     \node[blok, anchor = north west] (titel) at (top left |- header.south) {\aau@titel@blok};
     \node[blok, anchor = north west, yshift = -0.5cm] (generalia) at (titel.south west) {\aau@generalia@blok};
-    
-    \node[rectangle, draw = black, anchor = north west] (synopsis) at (generalia.north east) {\aau@synopsis@blok};
+    \node[rectangle, draw = black, inner sep = 6pt, anchor = north west] (synopsis) at (generalia.north east) {\aau@synopsis@blok};
     \node[blok, text width = \aau@dim@textwidth, anchor = south west] (copyr) at (bottom left) {\textit{\tiny\aau@localize@copyright}};
 
-%     \draw[black] (top left) -- (top right) -- (bottom right) -- (bottom left) -- cycle;
-%     \node[draw = black, text = black, rectangle] (bla) at (current page.center) {center};
+  \if@aau@debug
+    \draw[black] (top left) -- (top right) -- (bottom right) -- (bottom left) -- cycle;
+    \node[draw = black, fill = black, shape = circle, inner sep = 5pt] at (current page.center) {};
+  \fi
   \end{tikzpicture}
 }
 
@@ -94,7 +109,7 @@
 \def\aau@input@synopsis{
   \ifx\aau@projekt@synopsis\undefined
     Sæt den fil, der skal inputtes som synopsis, med \\
-    `\texttt{\string\synopsisinput\{filnavn\}}'
+    `\texttt{\string\aausetsynopsisfil\{filnavn\}}'
   \else
     \input{\aau@projekt@synopsis}
   \fi
@@ -307,3 +322,4 @@
   (151.8853,983.4896) .. (152.4981,994.2750) .. controls (153.0509,1004.0032)
   and (152.6818,1005.8690) .. (150.7454,1003.1365) -- cycle
 }
+\endinput
