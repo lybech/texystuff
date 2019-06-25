@@ -1,0 +1,64 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usepackage[english]{babel}
+% \usepackage[danish]{babel}  % Disse giver danske specialtegn
+% \usepackage{ucs}            % Unicode
+% \usepackage[T1]{fontenc}
+\usepackage{venturis}       % skrifttype
+
+\usetheme[]{Erebus}
+\title[The Erebus Theme]{The Erebus Theme}
+\subtitle[]{A further Development on the Hest Beamer Theme}
+\author[Me!]{Stian L. Lybech}
+\institute[AAU]{Aalborg Universitet}
+\date{25/6-2019}
+
+\begin{document}
+\begin{frame}[plain,noframenumbering] 
+  \maketitle
+\end{frame}
+
+% The usual way to insert the ToC
+% \begin{frame}{Indhold}{}
+%   \tableofcontents
+% \end{frame}
+
+% An alternative way to create the ToC in two columns
+\begin{frame}
+\frametitle{Indhold}
+\begin{columns}[t]
+  \begin{column}{.4\textwidth}
+    \tableofcontents[sections={1-2}]
+  \end{column}
+  \begin{column}{.6\textwidth}
+    \tableofcontents[sections={3-4}]
+  \end{column}
+\end{columns}
+\end{frame}
+
+%Section og subsection er kun relevant ift. TOC
+\section{Some section}
+\subsection{A subtitle}
+\begin{frame}{Some section}{A subtitle}
+Here is some text
+  \begin{shadeblock}{Here is a shadeblock}
+    \begin{itemize}
+      \item An item
+      \item Another item
+    \end{itemize}
+  \end{shadeblock}
+\end{frame}
+
+\begin{frame}
+This is just another frame, which I have added to demonstrate the `clock' effect of the rotating slide counter in the upper right corner.
+\end{frame}
+
+% Use this command to insert a slide to signal a new topic in the presentation
+\nextsection{Behind The Name}
+\begin{frame}
+\frametitle{The Meaning Behind The Name}
+\framesubtitle{The Erebus Beamer Theme}
+I created this theme for a presentation related to a project named ``Erebus,'' hence the name of the theme.
+\end{frame}
+
+\nextsection{End of Presentation}
+\end{document}

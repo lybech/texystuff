@@ -1,0 +1,73 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerinnerthemeErebus}[2018/03/13 v1.1.0 Hest Beamer Theme]
+\RequirePackage{tikz}
+
+\usetikzlibrary{shadings,fadings,backgrounds}
+
+% Af een eller anden grund laver BEAMER en margin på 1cm i venstre side, 
+% som er umulig at undgå, med mindre man smider indholdet i en box
+\let\oldmaketitle=\maketitle
+\def\maketitle{\makebox[\linewidth]{\oldmaketitle}}
+
+\mode<presentation> {
+  \setbeamerfont{institute}{family=\rmfamily, size = \footnotesize}
+  \setbeamerfont{title}{family=\rmfamily, size = \Huge} 
+  \setbeamerfont{subtitle}{family=\rmfamily, size = \large}
+  \setbeamerfont{author}{family=\rmfamily, size = \normalsize}
+  \setbeamerfont{date}{family=\rmfamily, size = \footnotesize}
+
+  \setbeamertemplate{title page}{
+    \setcounter{unnumberedframe}{0}
+
+    \begin{tikzpicture}
+%     [
+%       draw = Hest.bg,
+%       opacity=.35
+%     ]
+    %     \clip (0,-5) rectangle (11,1);
+      \begin{scope}[
+        draw = Hest.bg,
+        opacity=.35    
+      ]
+        \foreach \x in {0,0.05,...,2}{
+          \draw (0,\x) .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x) .. (\paperwidth,-5+3*\x);
+          \draw (0,\x-1) .. controls (4-\x,\x-2) and (11-2*\x,-4-3*\x) .. (\paperwidth,-3+3*\x);
+          \draw (0,\x-3) .. controls (4-\x,\x-2) and (11-4*\x,-1-4*\x) .. (\paperwidth,-5+3.5*\x);
+        }
+      \end{scope}
+      \coordinate (UL) at (0,4);
+      
+      \begin{scope}[
+        color = blue!20!black
+      ]
+        \node[anchor = north west] (title) at ([xshift = 1cm, yshift = -2cm]UL) { \usebeamerfont{title}\inserttitle };
+        \node[anchor = north west] (subtitle) at ([xshift = 1cm, yshift = -3cm]UL) { \usebeamerfont{subtitle}\insertsubtitle };
+      \end{scope}
+    \end{tikzpicture}
+  }
+    
+  \defbeamertemplate{separator page}{text}[1]{
+      \begin{center} 
+        \Huge #1
+      \end{center}
+  }
+  
+%   \newcommand{\nextsection}[1]{
+%     \begin{frame}[plain,noframenumbering]
+%       \setbeamertemplate{separator page}[text]{#1}
+%       \usebeamertemplate{separator page}
+%     \end{frame}
+%   }
+  
+  \newcommand{\nextsection}[1]{
+    \begin{frame}{}{}
+      \setbeamertemplate{separator page}[text]{#1}
+      \usebeamertemplate{separator page}
+    \end{frame}
+  }
+  
+  % use numbers instead of a picture for the references
+  \setbeamertemplate{bibliography item}[text]
+}
+
+\mode<all>
