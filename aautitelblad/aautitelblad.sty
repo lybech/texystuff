@@ -8,6 +8,15 @@
 \RequirePackage{enumitem} % til [leftmargin=*] på \begin{itemize}
 \RequirePackage{lastpage} % til sidste side i sidetallet
 
+%Nemmere end at kræve hyperref
+\ifx\url\undefined
+  \def\url#1{\texttt{#1}}
+\fi
+
+\ifx\hypersetup\undefined
+  \def\hypersetup#1{\relax}
+\fi
+
 \newif\if@aau@debug\@aau@debugfalse
 \DeclareOption{debug}{
   \@aau@debugtrue
@@ -71,11 +80,17 @@
 
 %%% Alt hvad der kan sættes %%%
 \def\aau@projekt@titel{Sæt titel med `\texttt{\string\aausettitel\{\}}'}
-\def\aausettitel#1{\def\aau@projekt@titel{#1}}
+\def\aausettitel#1{%
+  \def\aau@projekt@titel{#1}%
+  \hypersetup{pdftitle = {#1}}%
+}
 
 \def\aausettema#1{\def\aau@projekt@tema{#1}}
 \def\aausetprojektperiode#1{\def\aau@projekt@periode{#1}}
-\def\aausetgruppenavn#1{\def\aau@gruppe@navn{#1}}
+\def\aausetgruppenavn#1{%
+  \def\aau@gruppe@navn{#1}%
+  \hypersetup{pdfauthor = {#1}}%
+}
 
 \def\aausetgruppemedlem#1{
   \advance\aau@medlem@tal by 1
@@ -161,11 +176,6 @@
 \newcount\aau@medlem@tal\aau@medlem@tal=0
 \newcount\aau@vejleder@tal\aau@vejleder@tal=0
 
-%Nemmere end at kræve hyperref
-\ifx\url\undefined
-  \def\url#1{\texttt{#1}}
-\fi
-
 \long\def\aau@blaindent#1{
   \begin{itemize}\itemsep0em
     \item[] #1
@@ -179,6 +189,7 @@
 \def\aau@titel@blok{
   \parbox[t][][t]{\aau@dim@textwidth}{
     \begin{itemize}[leftmargin=*]
+      \title{\aau@projekt@titel}%
       \item[] \textbf{\aau@localize@titel:}
       \aau@blaindent{\aau@projekt@titel}
     \end{itemize}
@@ -221,6 +232,7 @@
       \aau@blaindent{\aau@sidetal}
       %
       \aau@testandset{aau@slut@dato}{
+        \date{\aau@slut@dato}%
         \item[] \textbf{\aau@localize@slutdato:}
         \aau@blaindent{\aau@slut@dato}
       }
