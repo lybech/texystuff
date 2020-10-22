@@ -10,6 +10,8 @@ Use them if you like. I take no responsibility for whatever headaches they may c
 * Erebus:
   This is an even nicer beamer theme
   
+* Wavylines
+  An even even nicer theme! Try it with the [arctic] option
 
 * aautitelblad: 
   A package to generate a title page for AAU project reports

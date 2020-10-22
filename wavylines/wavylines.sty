@@ -1,0 +1,250 @@
+% Wavy lines beamer theme 
+% A simplified and cleaned-up version of my previous Erebus beamer theme
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{wavylines}[2020/01/10 v1.0.0 Wavy Lines Beamer Theme]
+\RequirePackage{xcolor}
+\RequirePackage{etoolbox} %toggle
+\RequirePackage{tikz}
+\tikzset{
+  wavy lines/.style = {
+    draw = wavy@linecolor,
+    opacity = .35
+  },
+}
+
+\newtoggle{arctic}
+\DeclareOption{arctic}{\toggletrue{arctic}}
+\ProcessOptions\relax
+
+\def\@xnamedef#1{\expandafter\xdef\csname #1\endcsname}
+\def\starlist#1{\expandafter\csname starlist@#1\endcsname} %TODO: Virker ikke :(
+\def\randomstars#1#2#3#4{%
+  \pgfmathsetseed{2} %
+  \gdef\tmp@stars{}
+
+  \foreach \i in {1,...,#3}{   %
+    \pgfmathsetmacro\x{rnd*#1} %
+    \pgfmathsetmacro\y{rnd*#2} %
+    \xdef\tmp@stars{(\x,\y), \tmp@stars}
+  }
+  
+  \@xnamedef{starlist@#4}{\tmp@stars}
+  \global\let\tmp@stars\undefined
+}
+
+%defining colors (RGB = heltal, 0-255, rgb = kommatal m. brøker af x/255)
+\definecolor{lightblue}{RGB}{194,193,204} 
+\definecolor{greyblue} {RGB}{84,97,110} 
+\definecolor{darkblue} {RGB}{0,105,138} 
+
+\iftoggle{arctic}{
+  \colorlet{wavy@linecolor}{green!60!white} 
+  \colorlet{wavy@titlecolor}{white}
+  \colorlet{wavy@progressbarcolor}{lightblue}
+  \colorlet{wavy@progresslinecolor}{green!50!black}
+
+  \setbeamercolor{structure}  {fg = darkblue,        bg = white}
+  \setbeamercolor{normal text}{fg = white,           bg = black!80!blue}
+  \setbeamercolor{frametitle} {fg = wavy@titlecolor, bg = darkblue}
+  \setbeamercolor{block title}{fg = blue!20!black,   bg = darkblue}
+  \setbeamercolor{block body} {fg = white,           bg = lightblue}
+  \setbeamercolor{background} {fg = black,           bg = black!85!blue}
+  
+  \randomstars{17}{-8}{100}{background}
+  \randomstars{17}{-2}{20}{header}
+  
+  \setbeamertemplate{background canvas}{%
+    \usebeamercolor{background}
+    \tikz[remember picture, overlay] {
+      \shade[top color = background.fg, bottom color = background.bg] 
+      (current page.north west) rectangle (current page.south east);
+    }
+  }
+}{
+  \colorlet{wavy@linecolor}{blue!50!cyan} 
+  \colorlet{wavy@titlecolor}{blue!20!black}
+  \colorlet{wavy@progressbarcolor}{lightblue}
+  \colorlet{wavy@progresslinecolor}{blue!50!cyan}
+  
+  \setbeamercolor{structure}  {fg = darkblue,        bg = white}
+  \setbeamercolor{normal text}{fg = blue!20!black,   bg = white}
+  \setbeamercolor{frametitle} {fg = wavy@titlecolor, bg = darkblue}
+  \setbeamercolor{block title}{fg = blue!20!black,   bg = darkblue}
+  \setbeamercolor{block body} {fg = white,           bg = lightblue}
+}
+
+% Brug serif til alt
+\beamer@sansmathfalse
+\def\familydefault{\rmdefault}
+\def\mathfamilydefault{\rmdefault}
+
+\setbeamerfont{tiny structure}{family = \rmfamily}
+\setbeamerfont{structure}     {family = \rmfamily}
+\setbeamerfont{institute}     {family = \rmfamily, size = \footnotesize}
+\setbeamerfont{title}         {family = \rmfamily, size = \Huge} 
+\setbeamerfont{subtitle}      {family = \rmfamily, size = \large}
+\setbeamerfont{author}        {family = \rmfamily, size = \normalsize}
+\setbeamerfont{date}          {family = \rmfamily, size = \footnotesize}
+
+\setbeamertemplate{title page}{
+  \begin{tikzpicture}[
+    text field/.style = {
+      color = wavy@titlecolor,
+    },
+    title field/.style = {
+      text field,
+      text width = \textwidth,
+      anchor = north west
+    }
+  ]
+    \foreach \x in {0,0.05,...,2}{
+      \draw[wavy lines] (0,\x)   .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x)  .. (\paperwidth,-5+3*\x);
+      \draw[wavy lines] (0,\x-1) .. controls (4-\x,\x-2)    and (11-2*\x,-4-3*\x) .. (\paperwidth,-3+3*\x);
+      \draw[wavy lines] (0,\x-3) .. controls (4-\x,\x-2)    and (11-4*\x,-1-4*\x) .. (\paperwidth,-5+3.5*\x);
+    }
+
+    \coordinate (south) at (.5\paperwidth,-.5\paperheight);
+    
+    \node[title field] (title)    at (1cm,2cm)          { \usebeamerfont{title}\inserttitle };
+    \node[title field] (subtitle) at (title.south west) { \usebeamerfont{subtitle}\insertsubtitle };
+    
+    \node[text field]  (author)    at ([yshift = .5cm]south) { \usebeamerfont{author}\insertauthor };
+  \end{tikzpicture}
+}
+
+% the height of the header is 2.5 times the lineheight of the frame title
+\newlength{\beamer@height}
+\setlength{\beamer@height}{2.5\baselineskip}
+
+\setbeamertemplate{footline}{
+  \usebeamercolor{normal text}
+  \begin{tikzpicture}[
+    overlay,
+    progress bar/.style = {
+      draw = none, 
+      fill = wavy@progressbarcolor
+    },
+    progress line/.style = {
+      ultra thick, 
+      color = wavy@progresslinecolor
+    },
+    frame counter/.style = {
+      thick,
+      draw = wavy@progressbarcolor, 
+      fill = normal text.bg, 
+      text = normal text.fg,
+      shape = circle, 
+      minimum width = 2*1.05mm, 
+    },
+    author info/.style = {
+      anchor = south west,
+      text = normal text.fg, 
+    }
+  ]
+    \pgfmathsetmacro{\progress}{((\insertframenumber-1)/\inserttotalframenumber)*\paperwidth}
+    
+    \coordinate (lower left)  at (current page.south west);
+    \coordinate (lower right) at (current page.south east);
+    
+    \coordinate (upper left)  at ([yshift = 0.35cm]current page.south west);
+    \coordinate (upper right) at ([yshift = 0.35cm]current page.south east);
+    
+    \coordinate (cntstart)    at ([yshift = 0.5cm]lower left);
+    \coordinate (cntend)      at ([yshift = 0.5cm]lower right);
+    \coordinate (cntpos)      at ([xshift = \progress]cntstart);
+
+    \draw[progress bar]  ([yshift = -2pt]cntstart) rectangle ([yshift = 2pt]cntend);
+    \draw[progress line] (cntstart) -- (cntpos);
+    
+    \node[author info]   at (lower left) {\textbf{\insertshortauthor\ |\ \insertshorttitle}};
+    \node[frame counter] at (cntpos)     {\insertframenumber};
+  \end{tikzpicture}
+}
+
+\setbeamertemplate{frametitle}{
+  \begin{minipage}[c][0.9\beamer@height][c]{\textwidth}
+    \usebeamercolor[fg]{frametitle}
+    \usebeamerfont{frametitle}
+    \vskip1cm\center
+    \insertframetitle\par
+    \usebeamercolor[fg]{framesubtitle}
+    \usebeamerfont{framesubtitle}
+    \insertframesubtitle\par
+  \end{minipage}
+}
+
+\setbeamertemplate{headline}{
+  \tikz[remember picture, overlay]{ %
+    \foreach \x in {0,0.05,...,0.5} { %
+      \draw[wavy lines] (0,\x) .. controls (4-\x,-4-3*\x) and (17-2*\x,4-3*\x) .. (\paperwidth,-5+3*\x); %
+    } 
+  }
+}
+
+\iftoggle{arctic}{
+  \addtobeamertemplate{headline}{
+    \tikz[remember picture, overlay] { \foreach \c in \starlist@header {\draw[color = white, opacity = .60] \c circle (0.005);} }
+  }{}
+}{}
+
+% Hvad er dette?
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+% Ingen nav syms
+\setbeamertemplate{navigation symbols}{}
+
+% use numbers instead of a picture for the references
+\setbeamertemplate{bibliography item}[text]
+
+% Af een eller anden grund laver BEAMER en margin på 1cm i venstre side, 
+% som er umulig at undgå, med mindre man smider indholdet i en box
+\let\wavy@maketitle=\maketitle
+\long\def\maketitle{%
+  \begingroup
+  \iftoggle{arctic}{
+    \setbeamertemplate{background}{
+      \tikz[remember picture, overlay] {
+        \foreach \c in \starlist@background {\draw[color = white, opacity = .60] \c circle (0.005);} 
+      } 
+    }
+  }{}
+  \begin{frame}[plain,noframenumbering]
+    \makebox[\linewidth]{\wavy@maketitle}
+  \end{frame}
+  \endgroup
+}
+
+% Indsæt en blank side, når man kalder \section
+\let\wavy@section=\section
+\long\def\section#1{
+  \wavy@section{#1}
+  \begingroup
+  \iftoggle{arctic}{
+    \setbeamertemplate{background}{
+      \tikz[remember picture, overlay] { 
+        \foreach \c in \starlist@background {\draw[color = white, opacity = .60] \c circle (0.005);} 
+      } 
+    }
+  }{}
+  \setbeamertemplate{headline}{}
+  \begin{frame}{}{}
+  \begin{tikzpicture}[overlay]
+  \begin{scope}[xshift = -1cm, yshift = 2cm]
+    \foreach \x in {0,0.05,...,2}{
+      \draw[wavy lines] (0,\x) .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x) .. (\paperwidth,-5+3.5*\x);
+    } 
+  \end{scope}
+  \node[color = wavy@titlecolor] (title) at (0.5*\linewidth,-0.5cm) {\usebeamerfont{title}#1};
+  \end{tikzpicture}
+  \end{frame}
+  \endgroup
+}
+
+% Brug altid section name som undertitel, 
+% med mindre man sætter den eksplicit
+\addtobeamertemplate{frametitle}{%
+  \ifx\insertframesubtitle\empty
+    \let\insertframesubtitle\insertsectionhead
+  \fi
+}{}
