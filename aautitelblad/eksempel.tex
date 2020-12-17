@@ -80,12 +80,11 @@
 %%% Slut på opsætning af AAU-Titelblad %%%
 
 \begin{document}
-
-% Fjern sidehoved og sidefod mv. i memoir på denne side
-\thispagestyle{empty}
-
-%generer titelbladet
-\aautitelblad
+% generer titelbladet
+% Hvis du bruger memoir, så er pagestyle automatisk sat til empty
+% Og \clearpage kaldes efter titelbladet. 
+% Alternativt kan du kalde \aautitelblad og selv styre sideskift mv.
+\makeaautitlepage
 
 \end{document}
 

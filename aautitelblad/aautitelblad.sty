@@ -37,6 +37,11 @@
 
 \def\aau@blue{blue!30!black}
 
+\def\makeaautitlepage{%
+\aautitelblad%
+\clearpage%
+}
+
 \def\aautitelblad{
   \tikzset{baseblock/.style = {
       text = black,
@@ -95,10 +100,11 @@
 \def\aausetgruppemedlem#1{
   \advance\aau@medlem@tal by 1
   \ifnum\aau@medlem@tal > 1
-    \xdef\aau@gruppemedlemmer{\aau@gruppemedlemmer,#1}
+    \xdef\aau@gruppemedlemmer{\aau@gruppemedlemmer, #1}
   \else
     \gdef\aau@gruppemedlemmer{#1}
   \fi
+  \author{\aau@gruppemedlemmer}
 }
 
 \def\aausetvejleder#1{
@@ -130,6 +136,28 @@
     \input{\aau@projekt@synopsis}
   \fi
 }
+
+% Et par memoir-specifikke ting
+\@ifclassloaded{memoir}{% true branch
+% Sikr at pagestyle er tom, dvs. ingen sidetal mv., 
+% og at vi fylder resten af siden med blank mellemrum
+\def\makeaautitlepage{%
+\thispagestyle{empty}%
+\aautitelblad%
+\clearpage
+}
+% 
+% Tilføj automatisk synopsis til maketitle
+\def\maketitlehookd{%
+  \begin{abstract}
+    \aau@input@synopsis
+  \end{abstract}
+}
+% 
+% Alternativ, hvis man ikke bruger \makeaautitlepage
+\addtoiargdef{\title}{} {\hypersetup{pdftitle  = {#1}}}
+\addtoiargdef{\author}{}{\hypersetup{pdfauthor = {#1}}}
+}{} %false branch
 %%% Slut på alt hvad der kan sættes %%%
 
 %Standardoplysninger om studiet (til logo)
@@ -215,7 +243,7 @@
         \item[] \textbf{\aau@localize@gruppemedlemmer:}
         \begin{itemize}\itemsep0em
           \foreach \aau@medlem in \aau@gruppemedlemmer { \item[] \aau@medlem }
-          \global\let\aau@gruppemedlemmer\undefined
+%           \global\let\aau@gruppemedlemmer\undefined
         \end{itemize}      
       }
       \aau@testandset{aau@vejledere}{
