@@ -1,0 +1,28 @@
+\documentclass[a4paper,oneside,11pt,final]{memoir}
+\usepackage{polyglossia}
+\usepackage{fontspec}
+\usepackage{todox} % [disable] for at udelade alle kommentarer
+
+\setdefaultlanguage{english}
+\setmainfont{texgyreschola}[
+  Extension      = .otf,
+  UprightFont    = *-regular,
+  ItalicFont     = *-italic,
+  BoldFont       = *-bold,
+  BoldItalicFont = *-bolditalic,
+  Numbers        = OldStyle
+]
+\pagestyle{plain}
+\chapterstyle{article}
+
+%%% opsætning af todox %%%
+\deftodocomment{birger}{red!50!blue!80!white}
+\deftodocomment[Cool beans!]{stian}{green!50!black}
+
+\begin{document}
+\maketodolist
+
+Dette er noget tekst til at demonstrere brugen af todox, som er en udvidelse af todo-pakken.\stian{Dette er en kommentar, som vises med mit alias, sat i [...], i stedet for mit navn.}
+
+Dette er noget mere tekst.\birger{Her er ikke sat noget alias, så jeg kommenterer under mit eget navn.}
+\end{document}

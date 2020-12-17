@@ -1,0 +1,37 @@
+\NeedsTeXFormat{LaTeX2e}
+\RequirePackage{etoolbox} %toggle
+\ProvidesPackage{todox}
+
+\newtoggle{disable@todox}
+\DeclareOption{disable}{\toggletrue{disable@todox}}
+\ProcessOptions\relax
+
+% Ændr strengen i #1 til stort begyndelsesbogstav
+\def\capitalize#1{\expandafter\MakeUppercase #1}
+
+\def\deftodocomment{\@ifnextchar[\deftodocomment@threeargs\deftodocomment@twoargs}
+\def\deftodocomment@twoargs#1#2{\deftodocomment@threeargs[]{#1}{#2}}
+\def\deftodocomment@threeargs[#1]#2#3{%
+  \ifcsname #2\endcsname%
+    \relax%
+  \else%
+    \expandafter\newcommand%
+    \csname #2\endcsname[1]{%
+    \todo[color=#3]{%
+      \ifx\relax#1\relax %if #1 is empty
+        \textbf{\capitalize{#2}: }%
+          \else% 
+        \textbf{#1: }%
+      \fi ##1%
+      }
+    }%
+  \fi
+}
+
+\iftoggle{disable@todox}{
+  \RequirePackage[disable]{todonotes}
+  \def\maketodolist{\relax}
+}{
+  \RequirePackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+  \def\maketodolist{\listoftodos\clearpage}
+}
