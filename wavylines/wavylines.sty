@@ -14,11 +14,22 @@
 }
 
 \newtoggle{arctic}
+\newtoggle{spacy}
 \DeclareOption{arctic}{\toggletrue{arctic}}
+\DeclareOption{spacy}{\toggletrue{arctic}\toggletrue{spacy}}
 \ProcessOptions\relax
 
+%%% Utility macros %%%
+\def\@ifnotrelax#1#2{
+  \expandafter\ifx#1\relax%
+    \relax%
+  \else%
+    #2%
+  \fi%
+}
+
 \def\@xnamedef#1{\expandafter\xdef\csname #1\endcsname}
-\def\starlist#1{\expandafter\csname starlist@#1\endcsname} %TODO: Virker ikke :(
+
 \def\randomstars#1#2#3#4{%
   \pgfmathsetseed{2} %
   \gdef\tmp@stars{}
@@ -33,13 +44,13 @@
   \global\let\tmp@stars\undefined
 }
 
-%defining colors (RGB = heltal, 0-255, rgb = kommatal m. brøker af x/255)
+% defining colors (RGB = heltal, 0-255, rgb = kommatal m. brøker af x/255)
 \definecolor{lightblue}{RGB}{194,193,204} 
 \definecolor{greyblue} {RGB}{84,97,110} 
 \definecolor{darkblue} {RGB}{0,105,138} 
 
 \iftoggle{arctic}{
-  \colorlet{wavy@linecolor}{green!60!white} 
+  \colorlet{wavy@linecolor}{green!60!white}
   \colorlet{wavy@titlecolor}{white}
   \colorlet{wavy@progressbarcolor}{lightblue}
   \colorlet{wavy@progresslinecolor}{green!50!black}
@@ -72,6 +83,11 @@
   \setbeamercolor{frametitle} {fg = wavy@titlecolor, bg = darkblue}
   \setbeamercolor{block title}{fg = blue!20!black,   bg = darkblue}
   \setbeamercolor{block body} {fg = white,           bg = lightblue}
+}
+
+\iftoggle{spacy}{
+  \colorlet{wavy@linecolor}{blue!50!cyan}
+  \colorlet{wavy@progresslinecolor}{blue!50!cyan}
 }
 
 % Brug serif til alt
@@ -139,7 +155,11 @@
     },
     author info/.style = {
       anchor = south west,
-      text = normal text.fg, 
+      text = normal text.fg 
+    },
+    institute info/.style = {
+      anchor = south east,
+      text = normal text.fg
     }
   ]
     \pgfmathsetmacro{\progress}{((\insertframenumber-1)/\inserttotalframenumber)*\paperwidth}
@@ -157,7 +177,9 @@
     \draw[progress bar]  ([yshift = -2pt]cntstart) rectangle ([yshift = 2pt]cntend);
     \draw[progress line] (cntstart) -- (cntpos);
     
-    \node[author info]   at (lower left) {\textbf{\insertshortauthor\ |\ \insertshorttitle}};
+    \node[author info]     at (lower left)  {\textbf{\insertshortauthor\ |\ \insertshorttitle}};
+    \node[institute info]  at (lower right) {\textbf{\insertshortinstitute\ |\ \insertdate}};
+    
     \node[frame counter] at (cntpos)     {\insertframenumber};
   \end{tikzpicture}
 }
@@ -216,9 +238,12 @@
 }
 
 % Indsæt en blank side, når man kalder \section
-\let\wavy@section=\section
-\long\def\section#1{
-  \wavy@section{#1}
+\let\wavy@orig@section=\section
+\def\section{\@ifnextchar[\wavy@section{\wavy@section[\relax]}}
+
+\def\wavy@section[#1]#2{
+  \@ifnotrelax{#1}{\def\insertshortauthor{#1}}
+  \wavy@orig@section{#2}
   \begingroup
   \iftoggle{arctic}{
     \setbeamertemplate{background}{
@@ -235,7 +260,7 @@
       \draw[wavy lines] (0,\x) .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x) .. (\paperwidth,-5+3.5*\x);
     } 
   \end{scope}
-  \node[color = wavy@titlecolor, text width = .9\textwidth, align = center] (title) at (0.5*\linewidth,-0.5cm) {\usebeamerfont{title}#1};
+  \node[color = wavy@titlecolor, text width = .9\textwidth, align = center] (title) at (0.5*\linewidth,-0.5cm) {\usebeamerfont{title}#2};
   \end{tikzpicture}
   \end{frame}
   \endgroup
