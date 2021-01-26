@@ -235,7 +235,7 @@
       \draw[wavy lines] (0,\x) .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x) .. (\paperwidth,-5+3.5*\x);
     } 
   \end{scope}
-  \node[color = wavy@titlecolor] (title) at (0.5*\linewidth,-0.5cm) {\usebeamerfont{title}#1};
+  \node[color = wavy@titlecolor, text width = .9\textwidth, align = center] (title) at (0.5*\linewidth,-0.5cm) {\usebeamerfont{title}#1};
   \end{tikzpicture}
   \end{frame}
   \endgroup
