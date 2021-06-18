@@ -162,8 +162,12 @@
       text = normal text.fg
     }
   ]
-    \pgfmathsetmacro{\progress}{((\insertframenumber-1)/\inserttotalframenumber)*\paperwidth}
-    
+    \ifnum\inserttotalframenumber = 0
+      \def\progress{0}
+    \else 
+      \pgfmathsetmacro{\progress}{(((\insertframenumber)/\inserttotalframenumber)*\paperwidth) - 8pt}
+    \fi
+
     \coordinate (lower left)  at (current page.south west);
     \coordinate (lower right) at (current page.south east);
     
