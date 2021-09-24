@@ -55,13 +55,14 @@
   \colorlet{wavy@progressbarcolor}{lightblue}
   \colorlet{wavy@progresslinecolor}{green!50!black}
 
-  \setbeamercolor{structure}  {fg = darkblue,        bg = white}
-  \setbeamercolor{normal text}{fg = white,           bg = black!80!blue}
-  \setbeamercolor{frametitle} {fg = wavy@titlecolor, bg = darkblue}
-  \setbeamercolor{block title}{fg = blue!20!black,   bg = darkblue}
-  \setbeamercolor{block body} {fg = white,           bg = lightblue}
-  \setbeamercolor{background} {fg = black,           bg = black!85!blue}
-  
+  \setbeamercolor{structure}     {fg = darkblue,        bg = white}
+  \setbeamercolor{normal text}   {fg = white,           bg = black!80!blue}
+  \setbeamercolor{frametitle}    {fg = wavy@titlecolor, bg = darkblue}
+  \setbeamercolor{block title}   {fg = blue!20!black,   bg = darkblue}
+  \setbeamercolor{block body}    {fg = white,           bg = lightblue}
+  \setbeamercolor{background}    {fg = black,           bg = black!85!blue}
+  \setbeamercolor{section in toc}{fg = white,           bg = black!80!blue}
+ 
   \randomstars{17}{-8}{100}{background}
   \randomstars{17}{-2}{20}{header}
   
@@ -78,11 +79,12 @@
   \colorlet{wavy@progressbarcolor}{lightblue}
   \colorlet{wavy@progresslinecolor}{blue!50!cyan}
   
-  \setbeamercolor{structure}  {fg = darkblue,        bg = white}
-  \setbeamercolor{normal text}{fg = blue!20!black,   bg = white}
-  \setbeamercolor{frametitle} {fg = wavy@titlecolor, bg = darkblue}
-  \setbeamercolor{block title}{fg = blue!20!black,   bg = darkblue}
-  \setbeamercolor{block body} {fg = white,           bg = lightblue}
+  \setbeamercolor{structure}     {fg = darkblue,        bg = white}
+  \setbeamercolor{normal text}   {fg = blue!20!black,   bg = white}
+  \setbeamercolor{frametitle}    {fg = wavy@titlecolor, bg = darkblue}
+  \setbeamercolor{block title}   {fg = blue!20!black,   bg = darkblue}
+  \setbeamercolor{block body}    {fg = white,           bg = lightblue}
+  \setbeamercolor{section in toc}{fg = blue!20!black,   bg = white}
 }
 
 \iftoggle{spacy}{
@@ -102,6 +104,7 @@
 \setbeamerfont{subtitle}      {family = \rmfamily, size = \large}
 \setbeamerfont{author}        {family = \rmfamily, size = \normalsize}
 \setbeamerfont{date}          {family = \rmfamily, size = \footnotesize}
+\setbeamerfont{section number}{family = \rmfamily, size = \small}
 
 \setbeamertemplate{title page}{
   \begin{tikzpicture}[
@@ -115,9 +118,9 @@
     }
   ]
     \foreach \x in {0,0.05,...,2}{
-      \draw[wavy lines] (0,\x)   .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x)  .. (\paperwidth,-5+3*\x);
-      \draw[wavy lines] (0,\x-1) .. controls (4-\x,\x-2)    and (11-2*\x,-4-3*\x) .. (\paperwidth,-3+3*\x);
-      \draw[wavy lines] (0,\x-3) .. controls (4-\x,\x-2)    and (11-4*\x,-1-4*\x) .. (\paperwidth,-5+3.5*\x);
+      \draw[wavy lines] (0,\x)   .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x)  .. (\paperwidth+5pt,-5+3*\x);
+      \draw[wavy lines] (0,\x-1) .. controls (4-\x,\x-2)    and (11-2*\x,-4-3*\x) .. (\paperwidth+5pt,-3+3*\x);
+      \draw[wavy lines] (0,\x-3) .. controls (4-\x,\x-2)    and (11-4*\x,-1-4*\x) .. (\paperwidth+5pt,-5+3.5*\x);
     }
 
     \coordinate (south) at (.5\paperwidth,-.5\paperheight);
@@ -126,8 +129,27 @@
     \node[title field] (subtitle) at (title.south west) { \usebeamerfont{subtitle}\insertsubtitle };
     
     \node[text field]  (author)    at ([yshift = .5cm]south) { \usebeamerfont{author}\insertauthor };
+    \node[below = 0pt of author]  (institute) { \usebeamerfont{institute}\insertinstitute };
   \end{tikzpicture}
 }
+
+\setbeamertemplate{final page}{
+  \setbeamertemplate{headline}{}
+  \setbeamertemplate{footline}{}
+  \setbeamertemplate{background}{
+    \begin{tikzpicture}[remember picture, overlay]
+      \foreach \c in \starlist@background {\draw[color = white, opacity = .60] \c circle (0.005);}
+      
+      \begin{scope}[yshift = -2cm]
+        \foreach \x in {0,0.05,...,2}{
+          \draw[wavy lines] (0,\x) .. controls (4-\x,-4-3*\x) and (11-2*\x,4-3*\x) .. (\paperwidth,-5+3.5*\x);
+        } 
+      \end{scope}
+    \end{tikzpicture}
+  }
+  \usebeamercolor{normal text}
+}
+
 
 % the height of the header is 2.5 times the lineheight of the frame title
 \newlength{\beamer@height}
@@ -214,6 +236,29 @@
   }{}
 }{}
 
+
+\setbeamertemplate{section in toc}{%
+  \leavevmode\leftskip=2ex%
+  \llap{%
+    \usebeamerfont*{section number}%
+    \usebeamercolor{normal text}%
+    \tikz[baseline = (cnt.base)] { %
+      \node[
+        thick, 
+        draw = wavy@progressbarcolor, 
+        fill = normal text.bg, 
+        text = normal text.fg, 
+        shape = circle, 
+        minimum width = 2*1.05mm
+      ] (cnt) {\inserttocsectionnumber}; 
+    }
+    \kern1.25ex%
+  }%
+  \inserttocsection\par%
+}
+
+
+%\setbeamercolor{section number projected}{fg = blue!80!black, bg = white}
 % Hvad er dette?
 \setbeamertemplate{blocks}[rounded][shadow=true]
 
@@ -245,9 +290,22 @@
 \let\wavy@orig@section=\section
 \def\section{\@ifnextchar[\wavy@section{\wavy@section[\relax]}}
 
+% Vores egen implementation af \section
 \def\wavy@section[#1]#2{
-  \@ifnotrelax{#1}{\def\insertshortauthor{#1}}
-  \wavy@orig@section{#2}
+  \def\wavy@toc@entry{#2}
+  \@ifnotrelax{#1}{%
+    \def\insertshortauthor{#1}%
+    \def\wavy@toc@entry{#2 (#1)}%
+  }
+  \refstepcounter{section}%
+  \global\advance\beamer@tocsectionnumber by 1\relax%
+  \addtocontents{toc}{\protect\beamer@sectionintoc{\the\c@section}{\wavy@toc@entry}{\the\c@page}{\the\c@part}{\the\beamer@tocsectionnumber}}%
+  \gdef\insertsectionhead{#2}
+  
+  % Kald den oprindelige \section for faktisk at sætte \insertsectionhead
+  % Problem: Hver section bliver listet to gange i toc så...
+  % \wavy@orig@section{#2}
+
   \begingroup
   \iftoggle{arctic}{
     \setbeamertemplate{background}{
