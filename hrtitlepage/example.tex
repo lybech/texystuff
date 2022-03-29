@@ -12,17 +12,11 @@
   hidelinks 
 }
 
-% Automatically reuse title and author for hypersetup too
+% Automatically reuse title and author for hypersetup too (has nothing to do with the hrtitlepage package)
 \addtoiargdef{\title }{}{\hypersetup{pdftitle  = {#1}}}
 \addtoiargdef{\author}{}{\hypersetup{pdfauthor = {#1}}}
 
-\pagestyle{plain}           
-\chapterstyle{hangnum}      
-\setsecnumdepth{subsection} 
-
-\setlrmargins{*}{*}{1}     
-\checkandfixthelayout
-
+% Setup of the hrtitlepage package
 \title{Doing cool stuff\\by using \LaTeX}
 \author{Stian Lybech}
 \email{stian21@ru.is}
