@@ -1,0 +1,44 @@
+\documentclass[a4paper,oneside,11pt,final]{memoir}
+\usepackage{polyglossia}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{libertine}
+\usepackage{hrtitlepage} % you can also use the [style = report] option or create your own style
+
+\setdefaultlanguage{english}
+
+\hypersetup{
+  unicode    = true,
+  hidelinks 
+}
+
+% Automatically reuse title and author for hypersetup too
+\addtoiargdef{\title }{}{\hypersetup{pdftitle  = {#1}}}
+\addtoiargdef{\author}{}{\hypersetup{pdfauthor = {#1}}}
+
+\pagestyle{plain}           
+\chapterstyle{hangnum}      
+\setsecnumdepth{subsection} 
+
+\setlrmargins{*}{*}{1}     
+\checkandfixthelayout
+
+\title{Doing cool stuff\\by using \LaTeX}
+\author{Stian Lybech}
+\email{stian21@ru.is}
+%\date{\today} % this is set by default
+\documenttype{Thesis proposal}
+
+% Add an extra field to the title page (here: to give the name of the institute) 
+\renewcommand*{\maketitlehookc}{\begin{center}\emph{Reykjavík University}\end{center}}
+
+\begin{document}
+\begin{titlingpage}
+\maketitle 
+\end{titlingpage}
+
+\chapter{First chapter}
+\section{First section}
+Some interesting and relevant text.
+
+\end{document}
