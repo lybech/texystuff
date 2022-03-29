@@ -1,0 +1,423 @@
+% Package name: hrtitlepage.sty
+% Author: Stian Lybech stian21@ru.is
+% Description: Generate the title page with HR/RU logo (and nothing else!).
+% Thus we avoid forcing people to use a specific document class (such as the ugly article.cls)
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{hrtitlepage}%
+[2021/12/24 Package to generate a title page for Reykjavík University (Háskólinn í Reykjavḱ) reports]
+\RequirePackage{pgfopts}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\RequirePackage{lastpage}
+\RequirePackage{enumitem}
+\RequirePackage{etoolbox}
+\RequirePackage{geometry}
+
+% Parse package options
+\def\hr@titlepage@opts@style{nostylespecificed}
+\def\hr@titlepage@opts@left{2cm}
+\def\hr@titlepage@opts@right{2cm}
+\def\hr@titlepage@opts@top{1cm}
+
+
+% TODO: Sæt page geometry som options
+\pgfkeys{
+  /hrtitlepage/.cd,
+  style/.store in = \hr@titlepage@opts@style,
+  left/.store in  = \hr@titlepage@opts@left,
+  right/.store in = \hr@titlepage@opts@right,
+  top/.store in   = \hr@titlepage@opts@top
+}
+
+\ProcessPgfOptions{/hrtitlepage}
+
+% Colours for the logo
+\definecolor{ce53b23}{RGB}{229,59,35}
+\definecolor{ce21e24}{RGB}{226,30,36}
+\definecolor{cd12023}{RGB}{209,32,35}
+\definecolor{c4f4e4e}{RGB}{79,78,78}
+
+% Wrap hyperref if it is not used
+\ifx\href\undefined
+  \def\href#1{\relax}
+\fi
+
+% Helper macros
+\def\hr@typeset@email#1{\href{mailto:#1}{\normalsize\texttt{#1}}}
+\def\hr@testandset#1#2{
+  \ifcsname #1\endcsname #2\fi
+}
+\long\def\hr@titlepage@indent#1{
+  \begin{itemize}\itemsep0em
+    \item[] #1
+  \end{itemize}
+}
+
+% Count group members and supervisors
+\newcount\hr@coauthors@count\hr@coauthors@count=0
+\newcount\hr@supervisors@count\hr@supervisors@count=0
+
+% All elements that can be set
+\def\documenttype#1{\def\hr@titlepage@doctype{#1}}
+\def\email#1{\def\hr@titlepage@email{#1}}
+
+\def\projecttheme#1{\def\hr@project@theme{#1}}
+\def\projectperiode#1{\def\hr@project@period{#1}}
+\def\groupname#1{\def\hr@group@name{#1}}
+
+\def\coauthor#1{
+  \advance\hr@coauthors@count by 1
+  \ifnum\hr@coauthors@count > 1
+    \xdef\hr@coauthors{\hr@coauthors, #1}
+  \else
+    \gdef\hr@coauthors{#1}
+  \fi
+  \author{\hr@coauthors}
+}
+
+%\xapptocmd{\author}{\aausetgruppemedlem{#1}}{}{}
+
+\def\supervisor#1{
+  \advance\hr@supervisors@count by 1
+  \ifnum\hr@supervisors@count > 1
+    \xdef\hr@supervisors{\hr@supervisors,#1}
+  \else
+    \gdef\hr@supervisors{#1}
+  \fi
+}
+
+\def\pagecount#1{\def\hr@pagecount{#1}}
+\def\includeabstract{\def\aau@projekt@synopsis}
+
+\def\aau@projekt@titel{Set title with `\texttt{\string\title\{\}}'}
+\def\hr@pagecount{\pageref{LastPage}}
+\def\aau@input@synopsis{
+  \ifx\aau@projekt@synopsis\undefined
+    Set the file containing the abstract with \\
+    `\texttt{\string\includeabstract\{filename\}}'
+  \else
+    \input{\aau@projekt@synopsis}
+  \fi
+}
+
+\def\hr@titlepage@doctype{Report}
+\def\hr@titlepage@authoremail{student@ru.is}
+
+% I recommend using the memoir document class.
+% However, any class should be supported, so we avoid forcing people to use andy specific class.
+\@ifclassloaded{memoir}{
+  % Ensure the titling page is large enough if using memoir titlingpage env
+  \AtBeginEnvironment{titlingpage}{
+    \newgeometry{left=\hr@titlepage@opts@left, right=\hr@titlepage@opts@right, top=\hr@titlepage@opts@top}
+  }
+  \AtEndEnvironment{titlingpage}{
+    \thispagestyle{empty}
+    \restoregeometry
+  }
+}{% False branch
+  \def\droptitle{2cm}
+  \def\@bspretitle{\relax}
+  \def\@bsposttitle{\relax}
+  \def\@bspreauthor{\relax}
+  \def\@bspostauthor{\relax}
+  \def\@bspredate{\relax}
+  \def\@bspostdate{\relax}
+
+  \newcommand{\pretitle}[1]{\def\@bspretitle{#1}}
+  \newcommand{\posttitle}[1]{\def\@bsposttitle{#1}}
+  \newcommand{\preauthor}[1]{\def\@bspreauthor{#1}}
+  \newcommand{\postauthor}[1]{\def\@bspostauthor{#1}}
+  \newcommand{\predate}[1]{\def\@bspredate{#1}}
+  \newcommand{\postdate}[1]{\def\@bspostdate{#1}}
+  
+  \newcommand{\maketitlehooka}{}
+  \newcommand{\maketitlehookb}{}
+  \newcommand{\maketitlehookc}{}
+  \newcommand{\maketitlehookd}{}
+  
+  \renewcommand{\maketitle}{\par
+    \begingroup
+      \newgeometry{left=\hr@titlepage@opts@left, right=\hr@titlepage@opts@right, top=\hr@titlepage@opts@top}
+      \global\@topnum\z@
+      \ifdim\pagetotal>\z@
+        \newpage
+      \fi
+      \null
+      \vskip 2em%
+      \vspace*{\droptitle}
+      \maketitlehooka
+      {\@bspretitle \@title \@bsposttitle}
+      \maketitlehookb
+      {\@bspreauthor \@author \@bspostauthor}
+      \maketitlehookc
+      {\@bspredate \@date \@bspostdate}
+      \maketitlehookd
+      \par
+      \vskip 1.5em
+      \restoregeometry
+    \endgroup
+  }
+}
+
+\newcommand{\makehrtitlepagestyle}[2]{\@namedef{hr@titlepage@style@#1}{#2}}
+\newcommand{\usehrtitlepagestyle}[1]{\@nameuse{hr@titlepage@style@#1}}
+
+% Default page style
+\makehrtitlepagestyle{default}{
+  \def\droptitle{0pt}
+  \def\maketitlehooka{
+    \flushright
+    \tikz[x = 1pt, y = 1pt, yscale = -1.0, xscale = 1.0, inner sep=0pt, outer sep=0pt] { \hr@titlepage@logopath }
+    \vspace*{4cm}
+  }
+  \pretitle{\begin{center}\Huge}
+  \posttitle{\end{center}}
+  \def\maketitlehookb{
+    \begin{center}
+    \Large\textsc{\hr@titlepage@doctype}
+    \vspace*{4cm}
+    \end{center}
+  }
+  \preauthor{\begin{center}}
+  \postauthor{
+    
+    \hr@typeset@email{\hr@titlepage@email}
+    \end{center}
+  }
+  \predate{\begin{center}}
+  \postdate{\end{center}}
+}
+
+% Alias for the default style
+\makehrtitlepagestyle{report}{
+  \usehrtitlepagestyle{default}
+}
+
+% The project report style
+\makehrtitlepagestyle{project}{
+  \def\maketitlehooka{
+    \begingroup
+
+    %Save these for use in maketitlehookb
+    \edef\aau@title{\@title}
+    \edef\aau@date{\@date}
+    \edef\aau@author{\@author}
+
+    % Unset these to bypass the normal typesetting of title/author/date
+    \def\@title{\relax}
+    \def\@author{\relax}
+    \def\@date{\relax}
+
+    \setlength{\parindent}{0pt}
+    \flushright
+    \tikz[x = 1pt, y = 1pt, yscale = -1.0, inner sep=0pt, outer sep=0pt] { \hr@titlepage@logopath }
+    \par
+  }
+
+  \def\maketitlehookb{
+    \vspace{-1cm}
+    \begin{tikzpicture}[
+        block/.style = {
+          shape = rectangle, 
+          anchor = north west, 
+          inner sep = 5pt, 
+          outer sep = 0pt, 
+          text width = 0.47\textwidth
+        }
+      ]
+      \node[block, text width = 0.97\textwidth] (title) at (0,0) {%
+        \begin{itemize}[leftmargin=*, nosep]
+          \item[] \textbf{Title:}
+          \hr@titlepage@indent{\aau@title}
+        \end{itemize}
+      };
+
+      \node[block] (generalia) at ([yshift = -2cm]title.south west) {%
+      \begin{itemize}[leftmargin=*, nosep]
+        \hr@testandset{hr@project@theme}{
+          \item[] \textbf{Theme:}
+          \hr@titlepage@indent{\hr@project@theme}
+        }
+        \hr@testandset{hr@project@period}{
+          \item[] \textbf{Project period:}
+          \hr@titlepage@indent{\hr@project@period}
+        }
+        \hr@testandset{hr@group@name}{
+          \item[] \textbf{Group name:}
+          \hr@titlepage@indent{\hr@group@name}
+        }
+        \hr@testandset{hr@coauthors}{
+          \item[] \ifnum\hr@coauthors@count > 1 %
+            \textbf{Authors:}\else
+            \textbf{Author:}\fi
+          \begin{itemize}\itemsep0em
+            \foreach \hr@coauthor in \hr@coauthors { \item[] \hr@coauthor }
+          \end{itemize}      
+        }
+        \hr@testandset{hr@supervisors}{
+          \item[] \ifnum\hr@supervisors@count > 1 %
+            \textbf{Advisors:}\else
+            \textbf{Advisor:}\fi
+          \begin{itemize}\itemsep0em
+            \foreach \hr@tmp in \hr@supervisors { \item[] \hr@tmp }
+            \global\let\vejledere\undefined
+          \end{itemize}
+        }
+        \item[] \textbf{Pages:}
+        \hr@titlepage@indent{\hr@pagecount}
+        \hr@testandset{aau@date}{
+          \item[] \textbf{Date of completion:}
+          \hr@titlepage@indent{\aau@date}
+        }
+      \end{itemize}
+      };
+      
+      \node[block, draw = black] (abstract) at (generalia.north east) {
+        
+        \textbf{Abstract:} \\
+        \small
+        \aau@input@synopsis
+      };
+    \end{tikzpicture}
+  }
+
+  \def\maketitlehookd{
+    \endgroup
+  }
+}
+
+
+% Execute the requested page style
+\def\hr@titlepage@use@style{default}
+\xdef\hr@titlepage@tmp{hr@titlepage@style@\hr@titlepage@opts@style}
+\expandafter\ifcsname\hr@titlepage@tmp\endcsname
+  \xdef\hr@titlepage@use@style{\hr@titlepage@opts@style}
+\else
+  \PackageWarning{hrtitlepage}{%
+  The specified style `\hr@titlepage@opts@style' does not exist.
+  Default will be used.} 
+\fi
+
+\AtBeginDocument{
+  \usehrtitlepagestyle{\hr@titlepage@use@style}
+}
+
+
+% The HR/RU logo: 
+\def\hr@titlepage@logopath{%
+\path[fill=ce53b23,nonzero rule] (63.5273,66.8789) .. controls (65.4180,64.8438) and (67.6953,63.3984) .. (70.1445,62.5352) -- (60.5859,18.4922) .. controls (49.4727,21.2930) and (39.0039,27.2109) .. (30.6055,36.2266) .. controls (22.2109,45.2422) and (17.0508,56.1055) .. (15.0469,67.3945) -- (59.6602,73.7969) .. controls (60.3477,71.2930) and (61.6328,68.9141) .. (63.5273,66.8789);
+
+\path[fill=ce53b23,nonzero rule] (62.4102,68.2070) -- (42.8125,50.5859) .. controls (35.2305,59.6211) and (31.6758,71.4609) .. (33.0312,83.1758) -- (59.0938,79.2695) .. controls (58.8555,75.4062) and (59.9492,71.4688) .. (62.4102,68.2070);
+
+\path[fill=ce21e24,nonzero rule] (91.4766,83.6133) .. controls (90.7422,85.7695) and (89.5586,87.8086) .. (87.8984,89.5820) .. controls (87.7852,89.7070) and (87.6680,89.8242) .. (87.5469,89.9453) -- (119.4570,121.6250) .. controls (119.9102,121.1641) and (120.3750,120.7109) .. (120.8203,120.2344) .. controls (126.3125,114.3398) and (130.4062,107.6484) .. (133.1562,100.5703) -- cycle(91.4766,83.6133);
+
+\path[fill=ce53b23,nonzero rule] (81.4531,93.8633) .. controls (78.1328,95.0820) and (74.5000,95.2070) .. (71.0977,94.2344) -- (53.3398,135.6641) .. controls (69.1094,141.7969) and (86.8203,141.1680) .. (102.1172,133.9219) -- cycle(81.4531,93.8633);
+
+\path[fill=ce21e24,nonzero rule] (59.6797,82.7500) -- (16.3086,94.6719) .. controls (18.6641,103.2109) and (22.8867,111.3242) .. (28.9453,118.3633) -- (63.2812,89.3125) .. controls (61.5508,87.3750) and (60.3477,85.1289) .. (59.6797,82.7500);
+
+\path[fill=ce21e24,nonzero rule] (87.0625,66.0430) .. controls (88.1602,67.0625) and (89.0859,68.2031) .. (89.8438,69.4141) -- (131.0938,51.1758) .. controls (127.8711,44.5742) and (123.4219,38.4297) .. (117.7148,33.1250) .. controls (112.0078,27.8086) and (105.5547,23.8008) .. (98.7266,21.0547) -- (83.4609,63.4844) .. controls (84.7383,64.1602) and (85.9531,65.0078) .. (87.0625,66.0430);
+
+\path[fill=ce21e24,nonzero rule] (63.4766,66.8594) .. controls (63.8438,66.4609) and (64.2344,66.0898) .. (64.6328,65.7305) -- (44.2266,37.1133) .. controls (32.9453,45.7461) and (25.6719,58.7305) .. (24.1992,72.8594) -- (59.2578,75.3203) .. controls (59.8008,72.2539) and (61.1953,69.3047) .. (63.4766,66.8594);
+
+\path[fill=cd12023,nonzero rule] (87.6250,89.7891) .. controls (85.1445,92.3555) and (82.0352,93.9570) .. (78.7617,94.5742) -- (81.1016,120.8320) .. controls (86.1875,120.1875) and (91.2383,118.6250) .. (96.0195,116.0508) .. controls (100.8086,113.4766) and (104.9023,110.1133) .. (108.2422,106.2227) -- cycle(87.6250,89.7891);
+
+\path[fill=ce21e24,nonzero rule] (64.3086,90.4023) .. controls (62.8047,89.0000) and (61.6211,87.3828) .. (60.7539,85.6484) -- (37.2109,97.3633) .. controls (37.4102,97.7656) and (37.6094,98.1680) .. (37.8203,98.5664) .. controls (40.4805,103.5117) and (43.9805,107.7188) .. (48.0352,111.1211) -- (65.2695,91.2227) .. controls (64.9453,90.9609) and (64.6211,90.6914) .. (64.3086,90.4023);
+
+\path[fill=cd12023,nonzero rule] (76.5703,61.5781) -- (78.1211,35.3086) .. controls (71.9570,34.9492) and (65.6602,35.9180) .. (59.6484,38.3359) -- (69.2812,62.8203) .. controls (71.6055,61.8633) and (74.0938,61.4453) .. (76.5703,61.5781);
+
+\path[fill=cd12023,nonzero rule] (125.4688,64.1719) .. controls (122.6562,54.2188) and (117.1133,45.7773) .. (109.8945,39.4219) -- (87.5508,66.5547) .. controls (91.6562,70.7266) and (93.1211,76.5664) .. (91.8906,81.9414) -- (125.1055,93.4258) .. controls (127.9453,84.2188) and (128.2695,74.1289) .. (125.4688,64.1719);
+
+\path[fill=cd12023,nonzero rule] (113.5469,57.9883) .. controls (109.4805,50.4219) and (103.4688,44.5859) .. (96.4570,40.7305) -- (84.5312,64.2227) .. controls (85.4180,64.7812) and (86.2656,65.4258) .. (87.0586,66.1641) .. controls (90.6914,69.5469) and (92.4688,74.1719) .. (92.3594,78.7695) -- (118.5312,81.7617) .. controls (119.1758,73.7891) and (117.6211,65.5508) .. (113.5469,57.9883);
+
+\path[fill=ce21e24,nonzero rule] (84.6016,92.4336) .. controls (81.8477,94.1758) and (78.6797,95.0430) .. (75.5117,95.0039) -- (70.9570,129.8711) .. controls (77.0977,130.4414) and (83.4492,129.9219) .. (89.7422,128.1523) .. controls (96.0469,126.3789) and (101.7344,123.4961) .. (106.6797,119.7969) -- cycle(84.6016,92.4336);
+
+\path[fill=ce53b23,nonzero rule] (62.6719,67.9805) -- (51.4688,59.1523) .. controls (48.7188,62.6406) and (46.6953,66.7578) .. (45.6562,71.3008) -- (59.5273,74.6016) .. controls (60.0547,72.2461) and (61.0977,69.9805) .. (62.6719,67.9805);
+
+\path[fill=cd12023,nonzero rule] (64.4219,90.4414) .. controls (63.8672,89.9180) and (63.3555,89.3711) .. (62.8867,88.8047) -- (62.8906,88.8008) .. controls (62.7461,88.6211) and (62.6094,88.4414) .. (62.4727,88.2617) .. controls (62.4141,88.1797) and (62.3516,88.1055) .. (62.2930,88.0273) .. controls (62.1758,87.8633) and (62.0664,87.7031) .. (61.9570,87.5391) .. controls (61.8750,87.4141) and (61.7930,87.2930) .. (61.7148,87.1719) .. controls (61.6172,87.0195) and (61.5273,86.8672) .. (61.4336,86.7109) .. controls (61.3516,86.5664) and (61.2695,86.4258) .. (61.1875,86.2773) .. controls (61.1094,86.1367) and (61.0312,85.9922) .. (60.9570,85.8477) .. controls (60.8711,85.6797) and (60.7891,85.5078) .. (60.7109,85.3398) .. controls (60.6484,85.2109) and (60.5859,85.0820) .. (60.5312,84.9531) .. controls (60.4336,84.7266) and (60.3359,84.4961) .. (60.2461,84.2656) .. controls (60.2188,84.1875) and (60.1875,84.1094) .. (60.1562,84.0312) .. controls (60.0430,83.7227) and (59.9375,83.4062) .. (59.8398,83.0898) .. controls (59.7617,82.8203) and (59.6836,82.5469) .. (59.6172,82.2734) -- (25.5742,90.6992) .. controls (25.7031,91.2305) and (25.8203,91.7539) .. (25.9727,92.2773) .. controls (27.8086,98.7891) and (30.8203,104.6484) .. (34.7031,109.7070) -- (51.4453,97.2891) .. controls (54.0508,100.6250) and (57.3438,103.4336) .. (61.1406,105.4766) -- (67.4688,92.6875) .. controls (66.3984,92.0664) and (65.3711,91.3203) .. (64.4219,90.4414);
+
+\path[fill=ce21e24,nonzero rule] (80.2617,62.2109) -- (89.8945,28.4648) .. controls (82.7422,26.4297) and (75.0820,25.9219) .. (67.3867,27.1953) -- (72.8359,61.8516) .. controls (75.2969,61.4141) and (77.8320,61.5312) .. (80.2617,62.2109);
+
+\path[fill=ce21e24,nonzero rule] (85.9688,65.0820) -- (95.4062,54.3750) .. controls (90.9688,50.7148) and (85.4609,48.2461) .. (79.3203,47.5391) .. controls (73.1875,46.8320) and (67.2617,47.9766) .. (62.1094,50.5273) -- (68.8516,63.0977) .. controls (74.3594,60.5820) and (80.9805,61.2109) .. (85.9688,65.0820);
+
+\path[fill=ce53b23,nonzero rule] (105.7148,70.5352) -- (92.0273,74.6094) .. controls (92.8398,78.2266) and (92.4375,82.0664) .. (90.7891,85.4805) -- (103.1719,92.5664) .. controls (104.8867,89.3008) and (106.0352,85.6758) .. (106.4883,81.7969) .. controls (106.9375,77.9141) and (106.6367,74.1094) .. (105.7148,70.5352);
+
+\path[fill=cd12023,nonzero rule] (73.3477,94.7227) -- (71.2656,108.8203) .. controls (71.5859,108.8711) and (71.9023,108.9219) .. (72.2266,108.9609) .. controls (76.2383,109.4180) and (80.1641,109.0859) .. (83.8398,108.0898) -- (80.3359,94.2734) .. controls (78.0664,94.9180) and (75.6797,95.0703) .. (73.3477,94.7227);
+
+\path[fill=c4f4e4e,nonzero rule] (0.3281,65.6445) -- (0.5625,64.5078) -- (3.1445,65.0352) -- (3.7422,62.0781) -- (1.1641,61.5547) -- (1.3984,60.4141) -- (7.8867,61.7422) -- (7.6523,62.8789) -- (4.7266,62.2812) -- (4.1250,65.2344) -- (7.0508,65.8320) -- (6.8203,66.9688) -- cycle(0.3281,65.6445);
+
+\path[fill=c4f4e4e,nonzero rule] (7.5898,53.7500) -- (8.3047,51.8594) -- (5.2891,51.7812) -- (5.2773,51.8086) -- cycle(4.0000,51.9609) -- (4.4375,50.8047) -- (11.5391,50.7539) -- (11.0977,51.9180) -- (9.2383,51.8828) -- (8.3047,54.3594) -- (9.7266,55.5586) -- (9.3047,56.6758) -- cycle(2.5391,50.6055) -- (2.9805,49.4297) -- (3.7539,51.1367) -- (3.4844,51.8555) -- cycle(2.5391,50.6055);
+
+\path[fill=c4f4e4e,nonzero rule] (12.2891,44.2578) .. controls (13.1797,44.7617) and (13.8984,44.3047) .. (14.3555,43.4922) .. controls (14.8555,42.6094) and (14.6094,42.0273) .. (14.1719,41.7852) .. controls (13.7266,41.5312) and (13.4102,41.6719) .. (13.1914,41.8555) .. controls (12.8086,42.1719) and (12.4102,42.6367) .. (11.7422,43.3086) .. controls (10.9180,44.1406) and (10.1562,44.0938) .. (9.5586,43.7578) .. controls (8.4023,43.1016) and (8.4648,41.7305) .. (9.0547,40.6875) .. controls (9.7344,39.4844) and (10.9453,38.8359) .. (12.1484,39.5156) -- (11.5781,40.5273) .. controls (10.8047,40.1562) and (10.2500,40.5000) .. (9.8555,41.1953) .. controls (9.5898,41.6641) and (9.4258,42.3477) .. (10.0078,42.6758) .. controls (10.4062,42.9062) and (10.7930,42.7578) .. (11.1367,42.4102) .. controls (11.2148,42.3359) and (12.2656,41.2461) .. (12.5234,41.0000) .. controls (13.1797,40.3711) and (14.0352,40.3750) .. (14.6328,40.7109) .. controls (15.9219,41.4414) and (15.7891,42.8789) .. (15.1406,44.0273) .. controls (14.3945,45.3438) and (13.1641,46.0547) .. (11.7188,45.2695) -- cycle(12.2891,44.2578);
+
+\path[fill=c4f4e4e,nonzero rule] (14.2695,32.8750) -- (14.9883,31.9648) -- (17.3555,33.8320) -- (16.8164,29.6445) -- (17.6992,28.5273) -- (18.1367,32.2344) -- (23.0156,32.4805) -- (22.1250,33.6211) -- (18.2891,33.3633) -- (18.4375,34.6875) -- (20.1875,36.0625) -- (19.4688,36.9766) -- cycle(14.2695,32.8750);
+
+\path[fill=c4f4e4e,nonzero rule] (24.9883,25.6562) .. controls (25.8477,26.5977) and (27.1328,27.1211) .. (28.1797,26.1641) .. controls (29.2305,25.2031) and (28.8203,23.8789) .. (27.9648,22.9414) .. controls (27.1055,22.0000) and (25.8203,21.4766) .. (24.7695,22.4375) .. controls (23.7227,23.3906) and (24.1328,24.7227) .. (24.9883,25.6562)(28.8203,22.1562) .. controls (30.0977,23.5547) and (30.2891,25.5234) .. (28.8164,26.8633) .. controls (27.3516,28.2031) and (25.4102,27.8359) .. (24.1328,26.4375) .. controls (22.8555,25.0430) and (22.6680,23.0781) .. (24.1328,21.7344) .. controls (25.6016,20.3984) and (27.5430,20.7578) .. (28.8203,22.1562)(23.0977,20.3945) -- (24.0234,19.5469) -- (23.9453,21.4180) -- (23.3750,21.9375) -- cycle(23.0977,20.3945);
+
+\path[fill=c4f4e4e,nonzero rule] (31.9414,15.6602) -- (32.9102,15.0195) -- (36.0117,19.7070) -- (38.8203,17.8477) -- (39.3711,18.6836) -- (35.5938,21.1797) -- cycle(31.9414,15.6602);
+
+\path[fill=c4f4e4e,nonzero rule] (41.2500,10.1133) -- (42.2852,9.5977) -- (45.2305,15.5430) -- (44.1914,16.0547) -- cycle(41.2500,10.1133);
+
+\path[fill=c4f4e4e,nonzero rule] (48.6328,6.8242) -- (49.7930,6.4297) -- (54.2227,10.0820) -- (54.2383,10.0742) -- (52.6719,5.4570) -- (53.7227,5.1016) -- (55.8438,11.3789) -- (54.6875,11.7695) -- (50.2656,8.1211) -- (50.2422,8.1328) -- (51.8008,12.7461) -- (50.7578,13.0977) -- cycle(48.6328,6.8242);
+
+\path[fill=c4f4e4e,nonzero rule] (60.5352,3.3867) -- (61.7422,3.1875) -- (65.5312,7.5078) -- (65.5469,7.5039) -- (64.7422,2.6836) -- (65.8320,2.5078) -- (66.9219,9.0430) -- (65.7148,9.2461) -- (61.9414,4.9336) -- (61.9102,4.9375) -- (62.7109,9.7461) -- (61.6211,9.9258) -- cycle(60.5352,3.3867);
+
+\path[fill=c4f4e4e,nonzero rule] (78.2930,0.0000) -- (79.5430,0.0352) -- (78.1875,1.3242) -- (77.4141,1.3008) -- cycle(77.5078,1.9180) -- (78.6680,1.9492) -- (78.4688,8.5742) -- (77.3125,8.5469) -- cycle(77.5078,1.9180);
+
+\path[fill=c4f4e4e,nonzero rule] (90.4102,6.3750) -- (92.2695,6.7891) .. controls (92.9844,6.9492) and (93.4492,6.6836) .. (93.6016,6.0039) .. controls (93.7891,5.1797) and (93.2891,4.8945) .. (92.6992,4.7656) -- (90.8633,4.3555) -- cycle(89.9375,3.1797) -- (93.0273,3.8711) .. controls (94.4414,4.1836) and (95.0156,4.9961) .. (94.7695,6.0938) .. controls (94.4961,7.3320) and (93.5625,7.4609) .. (93.3359,7.4844) -- (93.3320,7.5039) .. controls (93.7109,7.6484) and (94.2148,8.0625) .. (93.9922,9.0859) .. controls (93.8242,9.8359) and (93.7773,10.5508) .. (93.9609,10.8672) -- (92.7500,10.5977) .. controls (92.6367,10.2773) and (92.7188,9.9258) .. (92.7891,9.6055) .. controls (93.0547,8.4219) and (92.9258,7.8438) .. (91.8828,7.6094) -- (90.2227,7.2344) -- (89.6250,9.8984) -- (88.4922,9.6445) -- cycle(89.9375,3.1797);
+
+\path[fill=c4f4e4e,nonzero rule] (101.7031,6.3984) -- (106.1406,8.1523) -- (105.7695,9.0859) -- (102.4141,7.7617) -- (101.7734,9.3711) -- (104.8867,10.6016) -- (104.5352,11.4844) -- (101.4258,10.2539) -- (100.7109,12.0586) -- (104.1367,13.4102) -- (103.7656,14.3438) -- (99.2656,12.5625) -- cycle(101.7031,6.3984);
+
+\path[fill=c4f4e4e,nonzero rule] (111.6328,15.4492) -- (111.5117,10.7148) -- (112.6758,11.3984) -- (112.6953,14.8438) -- (115.6836,13.1484) -- (116.8086,13.8008) -- (112.6328,16.0352) -- (111.3242,18.2812) -- (110.3203,17.6953) -- cycle(111.6328,15.4492);
+
+\path[fill=c4f4e4e,nonzero rule] (121.9688,17.4258) -- (122.8672,18.1602) -- (120.9727,20.5000) -- (125.1602,20.0156) -- (126.2734,20.9141) -- (122.5547,21.3047) -- (122.2461,26.1797) -- (121.1211,25.2695) -- (121.4219,21.4414) -- (120.1016,21.5781) -- (118.6992,23.3047) -- (117.7969,22.5742) -- cycle(121.9688,17.4258);
+
+\path[fill=c4f4e4e,nonzero rule] (130.0117,31.0703) .. controls (129.1641,31.8477) and (128.1328,32.4141) .. (126.8477,31.0117) .. controls (125.8984,29.9766) and (126.1875,28.9336) .. (127.0781,28.1172) -- (127.3359,27.8789) -- (128.1211,28.7344) -- (127.8711,28.9688) .. controls (127.3164,29.4727) and (127.1328,29.9219) .. (127.6094,30.4414) .. controls (128.1133,30.9922) and (128.5703,30.8125) .. (129.1797,30.2578) -- (132.5391,27.1797) -- (133.3203,28.0352) -- cycle(130.0117,31.0703);
+
+\path[fill=c4f4e4e,nonzero rule] (135.1758,36.8906) -- (136.3086,38.5703) -- (138.1133,36.1484) -- (138.0977,36.1250) -- cycle(138.7109,34.9961) -- (139.4023,36.0156) -- (135.3438,41.8438) -- (134.6484,40.8164) -- (135.7500,39.3164) -- (134.2695,37.1250) -- (132.4609,37.5898) -- (131.7969,36.6016) -- cycle(138.7109,34.9961);
+
+\path[fill=c4f4e4e,nonzero rule] (143.2656,42.4062) -- (143.7891,43.4922) -- (139.7891,47.2695) -- (139.7969,47.2852) -- (145.2578,46.5312) -- (145.7695,47.5977) -- (138.8203,48.4414) -- (138.2578,47.2734) -- cycle(143.2656,42.4062);
+
+\path[fill=c4f4e4e,nonzero rule] (150.0391,53.4336) -- (150.4375,54.6172) -- (148.7578,53.7891) -- (148.5156,53.0625) -- cycle(147.9688,53.3633) -- (148.3398,54.4609) -- (142.0586,56.5781) -- (141.6875,55.4766) -- cycle(147.9688,53.3633);
+
+\path[fill=c4f4e4e,nonzero rule] (150.2383,61.1523) -- (150.4648,62.2930) -- (147.5039,62.8750) -- (151.0312,65.1914) -- (151.3086,66.5938) -- (148.2031,64.5078) -- (144.8398,68.0547) -- (144.5625,66.6328) -- (147.2500,63.8906) -- (146.1484,63.1445) -- (143.9609,63.5703) -- (143.7344,62.4336) -- cycle(150.2383,61.1523);
+
+\path[fill=c4f4e4e,nonzero rule] (4.0820,92.2617) -- (4.5078,94.1172) .. controls (4.6719,94.8320) and (5.1172,95.1367) .. (5.7930,94.9844) .. controls (6.6172,94.7930) and (6.6562,94.2227) .. (6.5234,93.6367) -- (6.0938,91.7969) -- cycle(6.7578,90.4570) -- (7.4648,93.5391) .. controls (7.7930,94.9492) and (7.3125,95.8242) .. (6.2148,96.0742) .. controls (4.9766,96.3594) and (4.4609,95.5742) .. (4.3438,95.3828) -- (4.3242,95.3867) .. controls (4.3555,95.7930) and (4.2031,96.4258) .. (3.1797,96.6641) .. controls (2.4297,96.8320) and (1.7695,97.1016) .. (1.5586,97.4102) -- (1.2812,96.1914) .. controls (1.5195,95.9570) and (1.8750,95.8789) .. (2.1875,95.8047) .. controls (3.3750,95.5312) and (3.8438,95.1680) .. (3.6016,94.1250) -- (3.2227,92.4609) -- (0.5625,93.0742) -- (0.3008,91.9453) -- cycle(6.7578,90.4570);
+
+\path[fill=c4f4e4e,nonzero rule] (9.8477,101.2500) -- (11.6602,105.6641) -- (10.7305,106.0508) -- (9.3594,102.7070) -- (7.7539,103.3633) -- (9.0234,106.4570) -- (8.1445,106.8164) -- (6.8789,103.7266) -- (5.0820,104.4609) -- (6.4805,107.8633) -- (5.5508,108.2422) -- (3.7148,103.7695) -- cycle(9.8477,101.2500);
+
+\path[fill=c4f4e4e,nonzero rule] (11.6367,114.4062) -- (13.8750,110.2344) -- (14.5508,111.4023) -- (12.8555,114.4062) -- (16.2891,114.4102) -- (16.9414,115.5352) -- (12.2148,115.4102) -- (9.9688,116.7109) -- (9.3867,115.7109) -- cycle(11.6367,114.4062);
+
+\path[fill=c4f4e4e,nonzero rule] (20.0156,120.0078) -- (20.7305,120.9180) -- (18.3633,122.7852) -- (22.5586,123.2383) -- (23.4414,124.3672) -- (19.7266,123.9219) -- (18.3438,128.6055) -- (17.4492,127.4688) -- (18.5938,123.8047) -- (17.2734,123.6367) -- (15.5195,125.0156) -- (14.8047,124.1016) -- cycle(20.0156,120.0078);
+
+\path[fill=c4f4e4e,nonzero rule] (26.7422,134.1445) .. controls (25.9492,134.9805) and (24.9648,135.6172) .. (23.5781,134.3008) .. controls (22.5664,133.3398) and (22.7812,132.2773) .. (23.6133,131.4023) -- (23.8555,131.1484) -- (24.6953,131.9453) -- (24.4609,132.1914) .. controls (23.9414,132.7422) and (23.7891,133.1953) .. (24.3047,133.6797) .. controls (24.8477,134.2031) and (25.2891,133.9922) .. (25.8555,133.3945) -- (28.9961,130.0859) -- (29.8359,130.8867) -- cycle(26.7422,134.1445);
+
+\path[fill=c4f4e4e,nonzero rule] (33.4141,138.8594) -- (35.0781,140.0078) -- (35.8828,137.0977) -- (35.8594,137.0820) -- cycle(36.0234,135.8086) -- (37.0352,136.5117) -- (35.3672,143.4102) -- (34.3477,142.7031) -- (34.8281,140.9102) -- (32.6523,139.4023) -- (31.1445,140.4922) -- (30.1602,139.8125) -- cycle(36.0234,135.8086);
+
+\path[fill=c4f4e4e,nonzero rule] (42.6289,139.9648) -- (43.7148,140.4805) -- (42.9492,145.9297) -- (42.9688,145.9375) -- (46.7617,141.9414) -- (47.8242,142.4531) -- (42.9258,147.4492) -- (41.7617,146.8945) -- cycle(42.6289,139.9648);
+
+\path[fill=c4f4e4e,nonzero rule] (52.9375,144.2930) -- (54.0391,144.6484) -- (52.0352,150.9609) -- (50.9297,150.6133) -- cycle(52.9375,144.2930);
+
+\path[fill=c4f4e4e,nonzero rule] (60.0195,146.2383) -- (61.1641,146.4336) -- (60.6445,149.4062) -- (64.0742,146.9453) -- (65.4805,147.1836) -- (62.4219,149.3398) -- (64.5273,153.7422) -- (63.1016,153.5000) -- (61.5039,150.0078) -- (60.4141,150.7695) -- (60.0273,152.9609) -- (58.8867,152.7656) -- cycle(60.0195,146.2383);
+
+\path[fill=c4f4e4e,nonzero rule] (78.4297,147.7656) -- (79.5938,147.6914) -- (79.8555,151.5391) .. controls (79.9102,152.4336) and (80.0352,153.4570) .. (81.5391,153.3555) .. controls (83.0352,153.2539) and (83.0234,152.2188) .. (82.9609,151.3320) -- (82.7031,147.4805) -- (83.8594,147.4023) -- (84.1484,151.6328) .. controls (84.2656,153.3281) and (83.2344,154.2461) .. (81.6055,154.3594) .. controls (79.9727,154.4648) and (78.8359,153.6992) .. (78.7188,152.0039) -- cycle(78.4297,147.7656);
+
+\path[fill=c4f4e4e,nonzero rule] (89.7969,146.5352) -- (90.9922,146.2578) -- (95.0352,150.3477) -- (95.0547,150.3398) -- (93.9570,145.5781) -- (95.0352,145.3359) -- (96.5195,151.7969) -- (95.3281,152.0703) -- (91.2930,147.9922) -- (91.2656,148.0000) -- (92.3594,152.7500) -- (91.2773,152.9961) -- cycle(89.7969,146.5352);
+
+\path[fill=c4f4e4e,nonzero rule] (100.8633,143.4062) -- (101.9453,142.9922) -- (104.3242,149.1758) -- (103.2461,149.5898) -- cycle(100.8633,143.4062);
+
+\path[fill=c4f4e4e,nonzero rule] (106.9336,140.8359) -- (107.9922,140.2500) -- (111.9844,144.0312) -- (112.0000,144.0156) -- (110.9453,138.6094) -- (111.9727,138.0391) -- (113.2109,144.9297) -- (112.0781,145.5547) -- cycle(106.9336,140.8359);
+
+\path[fill=c4f4e4e,nonzero rule] (116.4102,135.0117) -- (120.1602,132.0586) -- (120.7773,132.8477) -- (117.9453,135.0820) -- (119.0195,136.4453) -- (121.6445,134.3789) -- (122.2305,135.1211) -- (119.6055,137.1914) -- (120.8047,138.7148) -- (123.6875,136.4375) -- (124.3086,137.2266) -- (120.5156,140.2188) -- cycle(116.4102,135.0117);
+
+\path[fill=c4f4e4e,nonzero rule] (127.4141,129.3125) -- (128.7031,127.9180) .. controls (129.2031,127.3789) and (129.2109,126.8398) .. (128.6992,126.3633) .. controls (128.0742,125.7930) and (127.5820,126.0859) .. (127.1758,126.5234) -- (125.8906,127.9102) -- cycle(124.4102,128.1172) -- (126.5625,125.7930) .. controls (127.5430,124.7305) and (128.5391,124.6406) .. (129.3633,125.4023) .. controls (130.2930,126.2656) and (129.9375,127.1289) .. (129.8438,127.3398) -- (129.8594,127.3516) .. controls (130.1719,127.0938) and (130.7891,126.8711) .. (131.5586,127.5820) .. controls (132.1211,128.1016) and (132.7148,128.5000) .. (133.0820,128.5000) -- (132.2383,129.4141) .. controls (131.9062,129.3438) and (131.6445,129.1016) .. (131.4023,128.8789) .. controls (130.5078,128.0547) and (129.9453,127.8750) .. (129.2188,128.6562) -- (128.0625,129.9102) -- (130.0664,131.7656) -- (129.2773,132.6172) -- cycle(124.4102,128.1172);
+
+\path[fill=c4f4e4e,nonzero rule] (135.7773,121.3828) .. controls (136.6250,121.9570) and (137.3750,121.5625) .. (137.8984,120.7969) .. controls (138.4727,119.9531) and (138.2773,119.3594) .. (137.8594,119.0742) .. controls (137.4414,118.7891) and (137.1133,118.8984) .. (136.8789,119.0664) .. controls (136.4688,119.3516) and (136.0312,119.7773) .. (135.3125,120.3906) .. controls (134.4180,121.1523) and (133.6641,121.0391) .. (133.0977,120.6562) .. controls (132.0000,119.9062) and (132.1758,118.5430) .. (132.8516,117.5547) .. controls (133.6328,116.4141) and (134.8906,115.8633) .. (136.0352,116.6445) -- (135.3789,117.6055) .. controls (134.6445,117.1719) and (134.0586,117.4648) .. (133.6055,118.1289) .. controls (133.3047,118.5703) and (133.0820,119.2383) .. (133.6367,119.6172) .. controls (134.0156,119.8789) and (134.4102,119.7617) .. (134.7852,119.4492) .. controls (134.8633,119.3789) and (136.0078,118.3789) .. (136.2812,118.1562) .. controls (136.9883,117.5781) and (137.8398,117.6523) .. (138.4062,118.0430) .. controls (139.6367,118.8828) and (139.3828,120.3008) .. (138.6406,121.3906) .. controls (137.7852,122.6406) and (136.4961,123.2422) .. (135.1250,122.3438) -- cycle(135.7773,121.3828);
+
+\path[fill=c4f4e4e,nonzero rule] (137.4141,110.3281) -- (137.9492,109.2969) -- (143.8203,112.3711) -- (143.2852,113.4023) -- cycle(137.4141,110.3281);
+
+\path[fill=c4f4e4e,nonzero rule] (140.3789,104.2227) -- (142.3047,99.2148) -- (143.2422,99.5742) -- (142.4844,101.5430) -- (147.7383,103.5586) -- (147.3203,104.6445) -- (142.0703,102.6250) -- (141.3164,104.5859) -- cycle(140.3789,104.2227);
+
+\path[fill=c4f4e4e,nonzero rule] (148.1406,93.0781) -- (143.6992,94.7188) -- (143.9688,93.4023) -- (147.2227,92.2695) -- (144.6602,89.9922) -- (144.9180,88.7148) -- (148.3711,91.9453) -- (150.9219,92.4609) -- (150.6875,93.5977) -- cycle(148.1406,93.0781);
+}
+
