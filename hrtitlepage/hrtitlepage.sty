@@ -61,6 +61,7 @@
 % All elements that can be set
 \def\documenttype#1{\def\hr@titlepage@doctype{#1}}
 \def\email#1{\def\hr@titlepage@email{#1}}
+\def\institute#1{\def\hr@titlepage@institute{#1}}
 
 \def\projecttheme#1{\def\hr@project@theme{#1}}
 \def\projectperiode#1{\def\hr@project@period{#1}}
@@ -103,6 +104,7 @@
 
 \def\hr@titlepage@doctype{Report}
 \def\hr@titlepage@authoremail{student@ru.is}
+\def\hr@titlepage@institute{Reykjavík University}
 
 % I recommend using the memoir document class.
 % However, any class should be supported, so we avoid forcing people to use andy specific class.
@@ -175,8 +177,13 @@
   \posttitle{\end{center}}
   \def\maketitlehookb{
     \begin{center}
-    \Large\textsc{\hr@titlepage@doctype}
-    \vspace*{4cm}
+      \Large\textsc{\hr@titlepage@doctype}
+      \vspace*{4cm}
+    \end{center}
+  }  
+  \def\maketitlehookc{
+    \begin{center}
+      \textit{\hr@titlepage@institute}
     \end{center}
   }
   \preauthor{\begin{center}}
