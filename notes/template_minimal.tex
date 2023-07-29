@@ -1,0 +1,63 @@
+% Et minimalt preamble/dokumentopsætningsskabelon
+% Nemt at bygge videre på, men godt udgangspunkt
+\documentclass[a4paper,oneside,11pt,final]{memoir}
+
+\usepackage{polyglossia}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+\setdefaultlanguage{danish}
+
+
+%\usepackage{fontspec}
+%\setmainfont{texgyreschola}[
+  %Extension      = .otf,
+  %UprightFont    = *-regular,
+  %ItalicFont     = *-italic,
+  %BoldFont       = *-bold,
+  %BoldItalicFont = *-bolditalic,
+  %Numbers        = OldStyle
+%]
+
+\usepackage{libertine}
+
+\hypersetup{
+  unicode    = true,
+  hidelinks % samme effekt som alle de nedenstående
+  %colorlinks = true,  % false: boxed links; true: colored links
+  %linkcolor  = black, % color of internal links
+  %citecolor  = black, % color of links to bibliography
+  %filecolor  = black, % color of file links
+  %urlcolor   = black  % color of external links
+}
+
+% Noget memoir-magi: I stedet for at sætte forfatter/titel både i hyperref og til \maketitle
+% så kan vi hæfte kaldet til hypersetup til \title og \author (xpatch dur desværre ikke)
+\addtoiargdef{\title }{}{\hypersetup{pdftitle  = {#1}}}
+\addtoiargdef{\author}{}{\hypersetup{pdfauthor = {#1}}}
+
+\pagestyle{plain}
+\chapterstyle{article}
+
+% Vi bruger ikke kapitler, så fjern kapitelnummer fra section
+% Til gengæld, sørg for at subsection også er numererede
+\counterwithout{section}{chapter}
+\setsecnumdepth{subsection}
+
+% lad h/v margin være lige brede
+\setlrmargins{*}{*}{1} 
+\checkandfixthelayout
+
+\title{My first document!}
+\author{Stian Lybech}
+\date{\today}
+
+\begin{document}
+\begin{titlingpage}
+\maketitle
+\end{titlingpage}
+
+\section{Section 1}
+Hej hej
+
+\end{document}

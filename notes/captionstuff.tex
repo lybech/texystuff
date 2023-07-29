@@ -1,0 +1,35 @@
+\section{Errors in caption}
+Everything in a caption is a `moving argument'.
+Many commands will therefore fail with bizarre errors if used in captions, unless they are prefixed with \protect or declared as robust.
+Here are two ways to insert coloured squares in the text:
+Either declare a robust command:
+
+\DeclareRobustCommand{\colorsquare}[1]{\tikz\node[shape = rectangle, fill = #1] {};}
+
+Or prefix every command with \protect; i.e. both \tikz and \node:
+
+\begin{figure}
+...
+\caption{The tasks marked in green \colorsquare{green!75!black} pertain to X. 
+The yellow \protect\tikz\protect\node[shape = rectangle, fill = yellow!75!black] {}; pertain to Y.}
+\end{figure}
+
+
+\section{Styling captions in memoir}
+How to typeset the name of the type of the figure: e.g. `figure' or `table'
+\captionnamefont{\small\bfseries}
+
+How to typeset the rest of the text:
+\captiontitlefont{\small}
+
+Center the caption, if it is too short to fill a whole line.
+Ellers brug lige marginer (som standard):
+\captionstyle[\centering]{} % evt. \captionstyle[\centering]{\raggedright} hvis vi ikke vil have en lige højremargin
+
+Bredden af en caption:
+%\captionwidth{\linewidth}\changecaptionwidth
+%\captionwidth{.9\linewidth}\changecaptionwidth
+
+Størrelsen på mellemrummet mellem figuren og caption, og mellem caption of teksten på siden.
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{0pt}

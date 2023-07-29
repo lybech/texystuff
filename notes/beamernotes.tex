@@ -1,0 +1,79 @@
+\defbeamertemplate = definer en template
+\setbeamertemplate = ANVEND en (allerede defineret) template
+\usebeamertemplate = ??? Hvad er forskellen på den og setbeamertemplate?
+
+Generelt om modes: 
+1: \mode<presentation>{ ... } indsætter kun { ... }, når vi er i presentation mode.
+2: \mode<presentation> vil "gobble" ALT efter denne linje, og frem til den næste \mode linje, når vi IKKE er i presentation mode.
+3: \mode* The effect of this mode is to ignore all text outside frames in the presentation modes. In article mode it has no effect.
+
+Man vælger en mode til sit dokument som en class-option til beamer
+
+Mode-hierarki:
+         <all> -> <article>       Article-mode: Til at opsætte tekst (fx send teksten videre til article.cls)
+                | <presentation>  Den overordnede mode til slides
+
+<presentation> -> <beamer>        Default mode
+                | <second>        Noget med hvis man vil have opsat slides for to skærme
+                | <handout>       Hvis man vil have lavet fx 4 slides pr A4-ark, til uddeling
+                | <trans>         Til at lave transparenter (næppe noget, man skal bruge mere)
+
+Fra manualen, s. 214:
+Note: When a TEX file ends, TEX must not be in the gobbling state. 
+Switch this state off using \mode on one line and <all> on the next.
+Derfor vil man ofte se dette i slutningen af en beamer-fil eller en beamertheme<noget>.sty fil:
+\mode
+<all>
+
+
+Overlay-aware commands:
+\newcommand<>{\FLASH}[1]{\textcolor#2{red}{#1}}
+
+Kommandoen er defineret med <> og med een parameter.
+Der er altid een parameter mere, end det nummer man angiver i [n].
+Det er overlay-specifikationen: I dette tilfælde #2.
+Se Beamer-manualen s. 87
+
+Effekten er nøjagtigt den samme som \alert, der også kan bruges med overlay specifiationer, fx \alert<2->{Hest}
+Farven kan ændres som en del af beamer-temaet med
+\setbeamercolor{alerted text}{fg=yellow}
+
+Nemmeste måde at lave pile der peger på tekst:
+ \def\tikzmark(#1){%
+ \tikz[remember picture]{%
+ \coordinate(#1);}%
+ }
+
+% Fix token not allowed in pdf string mht. græske bogstaver, 
+% hvis de bruges i overskrifter
+\pdfstringdefDisableCommands{%
+  \def\rho{rho}
+  \def\pi{pi}
+  \def\lambda{lambda}
+}
+
+% Indsæt noget, så det ligner et stykke papir:
+\tikzset{
+  paper/.style = {shape = rectangle, draw = black, inner sep = 0pt, anchor = south east, drop shadow}
+}
+
+\def\includepaper[#1] at (#2) #3;{ \tikz[remember picture, overlay] \node[paper, #1] at (#2) {\includegraphics[width = 4cm]{#3}}; }
+
+% Eksempelvis to ark oven på hinanden:
+% Tag et skærmprint af PDF'ens forside, og inkluder det:
+\onslide<1->{ \includepaper[rotate = -5] at ([xshift = -1.5cm, yshift = 1cm]current page.south east) {gorlaconference.png}; }
+\onslide<2->{ \includepaper[rotate = 10] at ([xshift = -0.5cm, yshift = 1.5cm]current page.south east) {gorlapaper.png}; }
+
+% Automatic uncovering
+\begin{itemize}[<+->]
+  \item Bla
+  \item Blabla
+\end{itemize}
+
+% To start uncovering from slide 2 instead of slide 1
+\begin{itemize}[<+(1)->]
+  \item Bla
+  \item Blabla
+\end{itemize}
+
+

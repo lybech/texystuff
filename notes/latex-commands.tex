@@ -1,0 +1,52 @@
+LATEX AND TEX COMMANDS
+
+\newcommand og \newcommand*
+You can say \long\def\foo{...}. This defines the \foo command to be \long, said otherwise, \par tokens are allowed inside the argument. In the case of \newcommand\foo{...} the result is a \long command, and \newcommand*\foo{...} produces a non-\long one.
+
+\AtEndDocument
+
+\newcommand{\mycommandStar}[2]{starred version}
+\newcommand{\mycommandNoStar}[1]{normal version}
+\newcommand{\mycommand}{\@ifstar
+                     \mycommandStar%
+                     \mycommandNoStar%
+}
+
+##1:
+Hvis jeg definerer en kommando (B) inde i definitionen af en anden kommando (A), skal jeg bruge ##1 til Bs interne parameter:
+\newcommand{\mycommand}{%
+\newcommand{\testkommando}[2]{Dette ##1 er en test ##2}
+}
+\mycommmand opretter \testkommando med to parametre.
+
+The \providecommand command is identical to the \newcommand command if a command with this name does not exist; if it does already exist, the \providecommand does nothing and the old definition remains in effect.
+
+%\the...
+Hvis counteren HEST findes, vil kommandoen \theHEST printe dens værdi.
+
+DEF og EDEF:
+\def\hest#1#2{Hej #1 og #2}
+\edef\ehest#1#2{\value{blah} + #1 - #2}
+In \def, values are not expanded, until the macro is called
+In \edef, values are expanded at definition-time
+
+IFS:
+\newif\if@hest\@hestfalse
+\newcommand*{\hest}{\@hesttrue}
+\if@hest\dosomething\else\dosomethingelse\fi
+
+Først definerer jeg min bool-variabel "@hest" og sætter dens default værdi til false.
+Dernæst definerer jeg en kommando, der sætter den til true.
+Endelig kan jeg så bruge \if@hest til at gøre \dosomething, hvis \@hest er true, og noget andet, hvis den er false.
+
+PACKAGE OPTIONS:
+\newif\if@hest\@hestfalse
+\def\havehest{\@hesttrue}
+\DeclareOption{hest}{\havegrl}
+\ProcessOptions %Options are processed here. So the IF is not set to true until AFTER this point
+
+\if@hest
+  \typeout{PRUUUUH!}
+\else
+  \typeout{Ingen hest :(}
+\fi

@@ -1,0 +1,18 @@
+\documentclass[a4paper,twoside,openright,11pt,final]{memoir}
+
+%%% opsætning af memoir %%%
+\pagestyle{plain}           % sidetal centreret i sidefoden, og intet andet
+\chapterstyle{hangnum}      % Hvis [article] er sat i documentclass, \chapter ligner \section, og \aliaspagestyle{chapter}{plain}
+\setsecnumdepth{subsection} % nummerer også subsection
+
+\setlrmargins{*}{*}{1}      % lad h/v margin være lige brede
+\checkandfixthelayout
+
+%%% Opsætning af caption %%%
+\captionnamefont{\small\bfseries}
+\captiontitlefont{\small}
+\captionstyle[\centering]{} % evt. \captionstyle[\centering]{\raggedright} i stedet
+\captionwidth{.9\linewidth}\changecaptionwidth
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{0pt}
+

@@ -1,0 +1,64 @@
+\documentclass[testmain.tex]{subfiles}
+
+% Pakke til code listing
+\usepackage{listings} 
+
+% Opsætning af farver til code listing
+\definecolor{strings}{rgb}{0,0.5,0}
+\definecolor{emphs}{rgb}{0.64,0.08,0.08}
+\definecolor{comments}{rgb}{0.17,0.57,0.68}
+\colorlet{keywords}{blue!50!cyan}
+
+% Definition af den style, vi ønsker at bruge
+\lstdefinestyle{mycodestyle}{
+  language=C,
+  captionpos=b,
+  numbers=left,
+  numberstyle=\tiny,
+  frame=lines,
+  showspaces=false,
+  showtabs=false,
+  breaklines=true,
+  showstringspaces=false,
+  breakatwhitespace=true,
+  emph={malloc, calloc, realloc, free, memset}, % tilføj selv andre ting fra stdlib, som I vil have fremhævet
+  emphstyle={\rmfamily\bfseries\color{emphs}},
+  commentstyle=\color{comments},
+  morekeywords={partial, var, value, get, set},
+  keywordstyle={\bfseries\color{keywords}},
+  stringstyle=\color{strings},
+  basicstyle=\ttfamily\small,
+  escapechar=@
+}
+
+
+\begin{document}
+\chapter{Dette er en test}
+
+\begin{figure}
+% Sæt style, caption og label (til brug for ref) 
+\begin{lstlisting}[style=mycodestyle, caption={Udpakning af kromosomet}, label=lst:test]
+/* m = antal e-mails i alt (kromosomets sande laengde) */
+int * unpack_chromosome(int *w, int m) {
+  int i = 0,
+      j = w[0],   /* Antallet af elementer incl w[0] */
+      *wm = NULL; /* Det udpakkede kromosom */
+      
+  /* alloker plads og saet alle elementer til nul */
+  wm = (int *) malloc(m * sizeof(int)); @\label{line:malloc}@
+  memset(wm, 0, m * sizeof(int));
+  
+  /* "udpak" kromosomet */
+  for (i = 1; i < j; i++)
+    wm[w[i]] = 1;
+
+  return wm;
+}
+\end{lstlisting}
+\end{figure}
+
+% Her er et eksempel på brug af ref til at indsætte det korrekte linjenummer
+På linje~\ref{line:malloc} i listing~\ref{lst:test} ser vi et kald til \texttt{malloc}.
+Det er pænt.
+
+\end{document}

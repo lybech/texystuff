@@ -1,0 +1,11 @@
+% Fix token not allowed in pdf string mht. græske bogstaver
+% Dette sker, hvis man fx forsøger at bruge $\pi$ i overskrifter og lignende kontekster
+% Denne kommando sørger for, at $\pi$ og de andre bliver redefineret i kontekster, hvor det ellers ville give en fejl.
+\pdfstringdefDisableCommands{%
+  \def\rho{rho}
+  \def\pi{pi}
+  \def\lambda{lambda}
+  \def\Omega{Omega}
+  \def\Psi{Psi}
+}
+

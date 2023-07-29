@@ -1,0 +1,87 @@
+% Sådan indlæser man forskellige font-filer incl. filer man har lokalt i mappen
+
+\usepackage{fontspec}
+
+% /usr/share/texmf-dist/fonts/opentype/public/tex-gyre/
+\setmainfont{texgyreschola}[
+  Extension      = .otf,
+  UprightFont    = *-regular,
+  ItalicFont     = *-italic,
+  BoldFont       = *-bold,
+  BoldItalicFont = *-bolditalic,
+  Numbers        = OldStyle
+]
+
+\setmathrm{texgyreschola-math.otf}
+\setmathsf{texgyreschola-math.otf}
+\setmathtt{texgyreschola-math.otf}
+\setboldmathrm{texgyreschola-math.otf}
+
+% Definer en ny fontkommando ud fra en font fil
+\newfontfamily{\phonemefont}{CharisSILCompact}[
+  Path           = fonts/,
+  Extension      = .ttf,
+  UprightFont    = *-R,
+  ItalicFont     = *-I,
+  BoldFont       = *-B,
+  BoldItalicFont = *-BI
+]
+
+% /usr/share/texmf-dist/fonts/opentype/public/qualitype/
+\newfontfamily{\blackletterfont}{QTFraktur}[Extension = .otf]
+\newfontfamily{\handwritingfont}{QTHandwriting}[Extension = .otf]
+
+% Linux libertine har en lidt underlig navngivning
+% Biolinum er deres sans-font
+% LinBiolinum_K.otf     % Keyboard font (til at lave noget der ligner keyboard taster)
+% LinBiolinum_R.otf     % Regular
+% LinBiolinum_RB.otf    % Regular Bold
+% LinBiolinum_RBO.otf   % Regular Bold "Oblique to fake italics" (??)
+% LinBiolinum_RI.otf    % Regular Italics
+% 
+% Libertine er deres serif-font
+% LinLibertine_M.otf    % Monospaced
+% LinLibertine_MB.otf   % Monospaced Bold
+% LinLibertine_MBO.otf  % Monospaced Bold Oldstyle
+% LinLibertine_MO.otf   % Monospaced Oblique
+% 
+% LinLibertine_R.otf    % Regular
+% LinLibertine_RB.otf   % Regular Bold
+% LinLibertine_RBI.otf  % Regular Bold Italics
+% LinLibertine_RI.otf   % Regular Italics
+
+% Disse kan bruges i stedet for den almindelige Regular og Regular Italics
+% LinLibertine_RZ.otf   % Regular SemiBold
+% LinLibertine_RZI.otf  % Regular SemiBold Italics
+% 
+% LinLibertine_DR.otf   % Display Regular (jeg aner ikke, hvad den er til)
+% LinLibertine_I.otf    % Initials? (tror jeg)
+
+\setsansfont{LinBiolinum}[
+  Extension      = .otf,
+  UprightFont    = *_R,
+  ItalicFont     = *_RI,
+  BoldFont       = *_RB
+]
+
+\setmainfont{LinLibertine}[
+  Extension      = .otf,
+  UprightFont    = *_R,
+  ItalicFont     = *_RI,
+  BoldFont       = *_RB,
+  BoldItalicFont = *_RBI,
+  Numbers        = OldStyle
+]
+
+\setmonofont{LinLibertine}[
+  Extension      = .otf,
+  UprightFont    = *_M,
+  ItalicFont     = *_MO,
+  BoldFont       = *_MB,
+  BoldItalicFont = *_MBO
+]
+
+\setmathrm{LibertinusMath-Regular.otf}
+\setmathsf{LibertinusMath-Regular.otf}
+\setmathtt{LibertinusMath-Regular.otf}
+\setboldmathrm{LibertinusMath-Regular.otf}

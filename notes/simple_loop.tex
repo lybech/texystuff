@@ -1,0 +1,16 @@
+\def\beginloop #1\endloop{%
+  \def\iterate{#1\iterate\fi}%
+  \iterate%
+}
+
+\def\REPEAT #1\FOR #2\TIMES{
+\count117=#2
+\beginloop #1
+\advance\count117 by -1
+\ifnum\count117 > 0
+\endloop
+}
+
+% Med dette kan vi fx sige
+\REPEAT na \FOR 16 \TIMES Batman! 
+
